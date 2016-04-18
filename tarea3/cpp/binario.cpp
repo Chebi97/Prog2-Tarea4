@@ -58,7 +58,7 @@ binario crear_filtrado(const int clave, comp_t criterio, const binario b) {
 
   binario fderecho, fizquierdo, res;
   binario res = crear_binario();
-  binario *buscador;
+  binario buscador;
   info_t raizbin, mayor;
 
   if (es_vacio_binario(b)){
@@ -87,7 +87,7 @@ binario crear_filtrado(const int clave, comp_t criterio, const binario b) {
                 while (buscador != NULL){
                   buscador = buscador->der;
                 }
-              mayor = buscador->dato
+              mayor = buscador->dato;
               remover_mayor(fizquierdo);
               insertar_en_binario(mayor, res);
               res->izq = fderecho;
@@ -116,11 +116,26 @@ binario crear_filtrado(const int clave, comp_t criterio, const binario b) {
 
 }
 
-/*void remover_de_binario(const texto_t t, binario &b) {}
+bool es_vacio_binario(const binario b) {
+  bool res = b == NULL;
+  return res;
+}
+
+void remover_de_binario(const texto_t t, binario &b) {
+  binario aux;
+  if (!es_vacio_binario(b)) {
+    if (b->dato->texto == t){
+      if (b->der == NULL) {
+        binario izq = b->izq;
+        delete (b);
+        b = izq;
+      } else if ()
+    }
+  }
+}
+/*
 
 void liberar_binario(binario &b) {}
-
-bool es_vacio_binario(const binario b) {}
 
 info_t raiz_binario(const binario b) {}
 
