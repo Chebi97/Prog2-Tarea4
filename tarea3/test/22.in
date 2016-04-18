@@ -1,0 +1,13 @@
+# remover_binario
+remover_binario q .
+insertar_binario (15,q) .
+remover_binario q .
+insertar_binario (14,c) .
+remover_binario q .
+insertar_binario (14,c) (16,d) (13,t) (5,z) .
+remover_binario d c .
+insertar_binario (1,u) .
+remover_binario c u t .
+insertar_binario (16,p) (13,j) (5,m) (6,a) (1,d) (3,c) .
+remover_binario j .
+Fin

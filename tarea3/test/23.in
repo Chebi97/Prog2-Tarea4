@@ -1,0 +1,13 @@
+# filtrar_binario
+filtrar_binario 12 > .
+insertar_binario (15,q) .
+filtrar_binario 12 > .
+filtrar_binario 15 = .
+filtrar_binario 22 < .
+filtrar_binario 22 > .
+insertar_binario (14,c) .
+insertar_binario (16,d) (13,t) (-3,c2) (9,c1) .
+filtrar_binario 15 < .
+filtrar_binario 12 > .
+filtrar_binario 22 > .
+Fin

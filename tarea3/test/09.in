@@ -1,0 +1,29 @@
+insertar_lista .
+recorrido
+insertar_lista (40,tierra) .
+insertar_lista (13,marte) .
+ordenar_lista
+insertar_lista (13,saturno) (27,pluton) .
+insertar_lista (100, sol) .
+ordenar_lista
+insertar_lista (10, mercurio) (70, jupiter) (80, venus) .
+recorrido
+segmentos 0 13
+segmentos 10 27
+segmentos 90 100
+segmentos 0 100
+modificar_lista 40 80
+modificar_lista 0 100
+modificar_lista 25 70
+modificar_lista 70 25
+filtrado_lista 27 <
+recorrido
+filtrado_lista 100 >
+recorrido
+filtrado_lista 0 =
+reversa_lista 27 70
+modificar_lista 70 27
+liberar_estructuras
+recorrido
+insertar_lista (1, sol) (4, tierra) .
+Fin

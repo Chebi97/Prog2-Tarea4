@@ -1,0 +1,34 @@
+1>(0,primero)
+2>(0,primero)(0,primero)
+3>(0,primero)(0,primero)(40,tierra)
+4>(0,primero)(0,primero)(0,primero)(40,tierra)(13,marte)
+5>5
+(0,primero)(0,primero)(0,primero)(40,tierra)(13,marte)
+(0,primero)(0,primero)(0,primero)(13,marte)(40,tierra)
+(0,primero)(13,marte)(40,tierra)
+6>(0,primero)(0,primero)(0,primero)(0,primero)(40,tierra)(13,marte)(13,saturno)(27,pluton)
+7>(0,primero)(0,primero)(0,primero)(0,primero)(0,primero)(40,tierra)(13,marte)(13,saturno)(27,pluton)(100, sol)
+8>10
+(0,primero)(0,primero)(0,primero)(0,primero)(0,primero)(40,tierra)(13,marte)(13,saturno)(27,pluton)(100, sol)
+(0,primero)(0,primero)(0,primero)(0,primero)(0,primero)(13,marte)(13,saturno)(27,pluton)(40,tierra)(100, sol)
+(0,primero)(13,marte)(27,pluton)(40,tierra)(100, sol)
+9>(0,primero)(0,primero)(0,primero)(0,primero)(0,primero)(0,primero)(40,tierra)(13,marte)(13,saturno)(27,pluton)(100, sol)(10, mercurio)(70, jupiter)(80, venus)
+10>(0,primero)(0,primero)(0,primero)(0,primero)(0,primero)(0,primero)(40,tierra)(13,marte)(13,saturno)(27,pluton)(100, sol)(10, mercurio)(70, jupiter)(80, venus)(80, venus)(70, jupiter)(10, mercurio)(100, sol)(27,pluton)(13,saturno)(13,marte)(40,tierra)(0,primero)(0,primero)(0,primero)(0,primero)(0,primero)(0,primero)
+11>(0,primero)(0,primero)(0,primero)(0,primero)(0,primero)(0,primero)(40,tierra)(13,marte)(13,saturno)
+(27,pluton)(100, sol)(10, mercurio)(70, jupiter)(80, venus)(0,primero)(0,primero)(0,primero)(0,primero)(0,primero)(0,primero)(40,tierra)(13,marte)(13,saturno)
+12>13>14>15>(27,pluton)(100, sol)(10, mercurio)(70, jupiter)(40,tierra)(0,primero)(0,primero)(0,primero)(0,primero)(0,primero)(0,primero)(80, venus)(13,marte)(13,saturno)
+(27,pluton)(100, sol)(10, mercurio)(70, jupiter)(40,tierra)(0,primero)(0,primero)(0,primero)(0,primero)(0,primero)(0,primero)(80, venus)(13,marte)(13,saturno)
+16>(27,pluton)(0,primero)(10, mercurio)(70, jupiter)(40,tierra)(100, sol)(0,primero)(0,primero)(0,primero)(0,primero)(0,primero)(80, venus)(13,marte)(13,saturno)
+(0,primero)(27,pluton)(10, mercurio)(70, jupiter)(40,tierra)(100, sol)(0,primero)(0,primero)(0,primero)(0,primero)(0,primero)(80, venus)(13,marte)(13,saturno)
+17>18>19>1
+(0,primero)(10, mercurio)(0,primero)(0,primero)(0,primero)(0,primero)(0,primero)(13,marte)(13,saturno)
+20>(0,primero)(27,pluton)(10, mercurio)(70, jupiter)(40,tierra)(100, sol)(0,primero)(0,primero)(0,primero)(0,primero)(0,primero)(80, venus)(13,marte)(13,saturno)(13,saturno)(13,marte)(80, venus)(0,primero)(0,primero)(0,primero)(0,primero)(0,primero)(100, sol)(40,tierra)(70, jupiter)(10, mercurio)(27,pluton)(0,primero)
+21>1
+
+22>(0,primero)(27,pluton)(10, mercurio)(70, jupiter)(40,tierra)(100, sol)(0,primero)(0,primero)(0,primero)(0,primero)(0,primero)(80, venus)(13,marte)(13,saturno)(13,saturno)(13,marte)(80, venus)(0,primero)(0,primero)(0,primero)(0,primero)(0,primero)(100, sol)(40,tierra)(70, jupiter)(10, mercurio)(27,pluton)(0,primero)
+23>6
+(0,primero)(0,primero)(0,primero)(0,primero)(0,primero)(0,primero)
+24>25>(0,primero)(70, jupiter)(10, mercurio)(27,pluton)(40,tierra)(100, sol)(0,primero)(0,primero)(0,primero)(0,primero)(0,primero)(80, venus)(13,marte)(13,saturno)
+(0,primero)(70, jupiter)(10, mercurio)(27,pluton)(40,tierra)(100, sol)(0,primero)(0,primero)(0,primero)(0,primero)(0,primero)(80, venus)(13,marte)(13,saturno)
+26>27>28>(0,primero)(1, sol)(4, tierra)
+29>Fin.

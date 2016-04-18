@@ -1,0 +1,20 @@
+# cantidad_caminos
+cantidad_caminos .
+insertar_binario (15,q) .
+cantidad_caminos .
+cantidad_caminos (15,q) .
+cantidad_caminos (15,a) .
+insertar_binario (12,d) .
+insertar_binario (18,o) (21,v) .
+insertar_binario (30,t) .
+cantidad_caminos (15,q) (21,v) (30,t) .
+cantidad_caminos (15,q) (21,z) (30,x) .
+cantidad_caminos (15,q) (12,v) (18,t) .
+cantidad_caminos (15,q) (12,v) (18,t) .
+cantidad_caminos (15,q) (12,v) .
+cantidad_caminos (15,q) (12,v) (18,t) (18,t) .
+cantidad_caminos (12,v) (18,t) .
+insertar_binario (30,z) (18,a) .
+cantidad_caminos (15,q) (21,z) (30,x) .
+cantidad_caminos (15,q) (12,v) (18,t) .
+Fin

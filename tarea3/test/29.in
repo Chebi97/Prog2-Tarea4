@@ -1,0 +1,16 @@
+# liberar_estructuras
+liberar_estructuras
+insertar_lista (13,abril) (27,abril) .
+insertar_binario (14,c) (16,d) (13,t) (5,a) .
+finitario (1,m) 1 .
+finitario (21,a) 1 .
+finitario (22,g) 2 .
+finitario (321,b) 2 1 .
+liberar_estructuras
+insertar_lista (13,abril) (27,abril) .
+insertar_binario (14,c) (16,d) (13,t) (5,a) .
+finitario (1,m) 1 .
+finitario (21,a) 1 .
+finitario (22,g) 2 .
+finitario (321,b) 2 1 .
+Fin

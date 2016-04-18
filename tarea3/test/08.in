@@ -1,0 +1,7 @@
+insertar_lista .
+insertar_lista (16,marzo) .
+insertar_lista (13,abril) .
+insertar_lista (13,abril) (27,abril) .
+liberar_estructuras
+insertar_lista (13,abril) (27,abril) .
+Fin

@@ -1,0 +1,16 @@
+# buscar_camino
+insertar_binario (15,q) .
+buscar_camino (15,q) .
+buscar_camino (18,q) .
+insertar_binario (12,d) .
+insertar_binario (18,o) (21,v) .
+insertar_binario (30,t) .
+buscar_camino (15,q) (21,v) (30,t) .
+buscar_camino (21,q) (55,v) (18,t) .
+buscar_camino (15,a) (21,v) (30,t) .
+buscar_camino (15,q) (21,v) (30,c) .
+buscar_camino (12,v) (18,t) .
+buscar_camino (12,q) (18,d) (-2,o) .
+buscar_camino (12,q) (18,d) .
+buscar_camino (12,q) (18,d) (-2,o) (5,y) .
+Fin

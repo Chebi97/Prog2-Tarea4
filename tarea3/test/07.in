@@ -1,0 +1,6 @@
+insertar_lista (16,marzo) (13,abril) (27,abril) .
+reversa_lista 13 16
+modificar_lista 13 27
+reversa_lista 13 16
+reversa_lista 0 27
+Fin

@@ -1,0 +1,13 @@
+# buscar_abb
+insertar_binario (15,q) .
+buscar_subarbol q .
+buscar_subarbol t .
+insertar_binario (12,d) .
+insertar_binario (18,o) (21,v) .
+insertar_binario (30,t) .
+buscar_subarbol q .
+buscar_subarbol v .
+buscar_subarbol t .
+buscar_subarbol o .
+buscar_subarbol m .
+Fin

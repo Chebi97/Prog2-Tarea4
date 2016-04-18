@@ -1,0 +1,6 @@
+# finitario
+finitario (1,m) 1 .
+finitario (21,a) 1 .
+finitario (22,g) 2 .
+finitario (321,b) 2 1 .
+Fin

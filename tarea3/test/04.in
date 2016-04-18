@@ -1,0 +1,7 @@
+insertar_lista (16,marzo) (27,abril) (13,abril) .
+modificar_lista 0 13
+modificar_lista 27 27
+modificar_lista 27 16
+modificar_lista 13 27
+modificar_lista 13 16
+Fin

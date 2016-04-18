@@ -1,0 +1,8 @@
+insertar_lista (16,marzo) (13,abril) (27,abril) .
+filtrado_lista 16 <
+filtrado_lista 16 =
+filtrado_lista 16 >
+insertar_lista (0,otro) (16,enero) .
+filtrado_lista 16 =
+filtrado_lista 0 =
+Fin

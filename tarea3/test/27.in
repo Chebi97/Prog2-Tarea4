@@ -1,0 +1,12 @@
+# kesimo_abb
+insertar_binario (15,q) .
+kesimo_subarbol 1 .
+insertar_binario (12,d) .
+insertar_binario (18,o) (21,v) .
+insertar_binario (30,t) .
+kesimo_subarbol 1 .
+kesimo_subarbol 2 .
+kesimo_subarbol 3 .
+kesimo_subarbol 4 .
+kesimo_subarbol 5 .
+Fin

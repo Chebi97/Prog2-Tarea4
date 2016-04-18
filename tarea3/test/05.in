@@ -1,0 +1,7 @@
+insertar_lista (16,marzo) .
+ordenar_lista
+insertar_lista (0,anterior) (0,ultimo) (16,enero) .
+ordenar_lista
+insertar_lista (13,abril) (27,abril) .
+ordenar_lista
+Fin

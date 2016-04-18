@@ -1,0 +1,6 @@
+# insertar_binario
+insertar_binario .
+insertar_binario (15,q) .
+insertar_binario (14,c) .
+insertar_binario (16,d) (13,t) (-3,m) .
+Fin

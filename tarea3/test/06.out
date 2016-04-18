@@ -1,0 +1,13 @@
+1>(0,primero)(16,marzo)(13,abril)(27,abril)
+2>1
+(0,primero)(13,abril)
+3>1
+(16,marzo)
+4>1
+(27,abril)
+5>(0,primero)(0,primero)(16,marzo)(13,abril)(27,abril)(0,otro)(16,enero)
+6>2
+(16,marzo)(16,enero)
+7>3
+(0,primero)(0,primero)(0,otro)
+8>Fin.
