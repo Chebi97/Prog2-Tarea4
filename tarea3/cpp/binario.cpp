@@ -34,42 +34,39 @@ bool insertar_en_binario(const info_t i, binario &b) {
 
   if (es_vacio_binario(b)){
     b->dato = i;
-    b->izq = b->der = NULL:
+    b->izq = b->der = NULL;
     res = true;
     return res;
   } else {
-    comp_t comparacion = comparar_texto(i, b->dato);
+    comp_t comparacion = comparar_texto(texto_info(i), texto_info(b->dato));
     switch (comparacion) {
       case igual: {
-        return res;
-        break;
-      }
-      case mayor: {
+        res = false;
+      break;
+    } case mayor: {
         if (b->der== NULL){
-          insertado = crear_binario();
+          binario insertado = crear_binario();
           insertado->dato = i;
           b->der = insertado;
           res = true;
-          return res;
         } else {
           insertar_en_binario(i, b->der);
-        }
-        break;
       }
-      case menor:{
-        if (b->izq== NULL){
-          insertado = crear_binario();
+      break;
+    } case menor:{
+        if (b->izq == NULL){
+          binario insertado = crear_binario();
           insertado->dato = i;
           b->izq = insertado;
           res = true;
-          return res;
         } else {
           insertar_en_binario(i, b->izq);
         }
-        break;
-
-    return res;
+      break;
+      }
+    }
   }
+  return res;
 }
 
 
