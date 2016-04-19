@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
+#include <algorithm.h>
 
 struct rep_binario {
   info_t dato;
@@ -122,35 +123,112 @@ bool es_vacio_binario(const binario b) {
 }
 
 void remover_de_binario(const texto_t t, binario &b) {
-  binario aux;
   if (!es_vacio_binario(b)) {
-    if (b->dato->texto == t){
-      if (b->der == NULL) {
-        binario izq = b->izq;
-        delete (b);
-        b = izq;
-      } else if ()
+    comp_t comparacion = comparar_texto(texto_info(b->dato), t);
+    switch (comparacion) {
+      case igual: {
+        if (b->der == NULL) {
+          binario izq = b->izq;
+          liberar_info(b->dato);
+          delete (b);
+          b = izq;
+        } else if (b->izq == NULL) {
+          binario der = b->der;
+          liberar_info(b->dato);
+          delete (b);
+          b = der;
+        } else {
+          liberar_info(b->dato);
+          b->dato = remover_mayor(b->izq);
+        }
+        break;
+      }
+      case mayor: {
+        remover_de_binario(t, b->izq);
+        break;
+      }
+      case menor:{
+        remover_de_binario(t, b->der);
+        break;
+      }
     }
   }
 }
-/*
 
-void liberar_binario(binario &b) {}
+void liberar_binario(binario &b) {
+  if(!es_vacio_binario(b)){
+    info_t aux = remover_mayor(b);
+    liberar_info(aux);
+    liberar_binario(b);
+  }
+}
 
-info_t raiz_binario(const binario b) {}
+info_t raiz_binario(const binario b) {
+  info_t res = b->dato;
+  return res;
+}
 
-binario izquierdo(const binario b) {}
+binario izquierdo(const binario b) {
+  binario res = b->izq;
+  return res;
+}
 
-binario derecho(const binario b) {}
+binario derecho(const binario b) {
+  binario res = b->der;
+  return res;
+}
 
-binario buscar_subarbol(const texto_t t, const binario b) {}
+binario buscar_subarbol(const texto_t t, const binario b) {
+  binario res = NULL;
+  if (!es_vacio_binario(b)) {
+    comp_t comparacion = comparar_texto(texto_info(b->dato), t);
+    switch (comparacion) {
+      case igual: {
+        res = b;
+        break;
+      }
+      case mayor: {
+        buscar_subarbol(t, b->izq);
+        break;
+      }
+      case menor: {
+        buscar_subarbol(t, b->der);
+        break;
+      }
+    }
+  }
+  return res;
+}
 
-nat altura_binario(const binario b) {}
+nat altura_binario(const binario b) {
+  nat res = 0;
+  if (!es_vacio_binario(b)) {
+    res = 1 + std::max(altura_binario(b->der), altura_binario(b->izq));
+  }
+  return res;
+}
 
-nat cantidad_binario(const binario b) {}
+nat cantidad_binario(const binario b) {
+  nat res = 0;
+  if (!es_vacio_binario(b)) {
+    res = 1 + cantidad_binario(b->der) + cantidad_binario(b->izq);
+  }
+  return res;
+}
 
-nat cantidad_de_caminos(const lista l, const binario b) {}
-*/
+nat cantidad_de_caminos(const lista l, const binario b) {
+  nat res = 0;
+  if (!es_vacia_lista(l) && !es_vacio_binario(b)) {
+    if (numero_info(info_lista(inicio_lista(l), l)) == numero_info(b->dato)) {
+      lista lTail = segmento_lista(siguiente(inicio_lista(l), l), final_lista(l), l);
+      res = cantidad_de_caminos(lTail, b->der) + cantidad_de_caminos(lTail, b->izq);
+    }
+  } else if (es_vacia_lista(l) && es_vacio_binario(b)) {
+    res = 1;
+  }
+  return res;
+}
+
 /*
   Auxiliar para camino_a_texto.
  */
@@ -188,6 +266,19 @@ texto_t camino_a_texto(const camino_t c) {
   return res;
 }
 
-/*camino_t buscar_camino(const lista l, const binario b) {}
+camino_t buscar_camino(const lista l, const binario b) {
+  camino_t res;
+  res.existe = false;
+  res.cantidad_ramas = 0;
+
+  if (!es_vacia_lista(l) && !es_vacio_binario(b)) {
+    if (texto_info(info_lista(inicio_lista(l), l)) == texto_info(b->dato)) {
+      lista lTail = segmento_lista(siguiente(inicio_lista(l), l), final_lista(l), l);
+      //no esta terminada
+    }
+  }
+}
+
+/*
 
 void imprimir_binario(const binario b) {}*/
