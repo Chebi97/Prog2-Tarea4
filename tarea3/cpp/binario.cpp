@@ -84,66 +84,80 @@ info_t remover_mayor(binario &b) {
 }
 
 
-binario crear_filtrado(const int clave, comp_t criterio, const binario b) {
-
-  binario fderecho, fizquierdo, res;
-  binario res = crear_binario();
-  binario buscador;
-  info_t raizbin, mayor;
-
-  if (es_vacio_binario(b)){
-    return res; //que sea vacio significa que no tiene un elemento cargado o que apunta a null?
-  } else {
-    fderecho = crear_filtrado(clave, criterio, b->der);
-    fizquierdo = crear_filtrado(clave, criterio, b->izq);
-    raizbin = raiz_binario(b);
-    switch (clave) {
-      case menor:{
-        if (numero_info(raizbin) < clave){
-          insertar_en_binario(raizbin, res);
-          res->izq = fderecho;
-          res->der = fizquierdo;
-          return res;
-        } else {
-          if (es_vacio_binario(fizquierdo)){
-            liberar_binario(fizquierdo);
-            return fderecho;
-          } else {
-            if (es_vacio_binario(fderecho)){
-              liberar_binario(fderecho);
-              return fizquierdo;
-            } else {
-              buscador = b->izq; //no hay un mayor para arboles en este programa de m***?
-                AZ (buscador != NULL){
-                  buscador = buscador->der;
+binario crear_filtrado(const int clave, comp_t criterio, const binario b) { 
+//habria que revisar en realidad, con analizar uno de los casos del swithc alcanza, los demas son analogos
+   
+    
+    binario res = crear_binario();
+    binario fderecho, fizquierdo, raiz;
+    
+    raiz = b; //necesario raiz??
+    
+    switch (criterio){
+        
+        case menor {
+            if (!es_vacio_binario(raiz)){
+                if (numero_info(raiz->dato) < clave){
+                    insertar_en_binario(raiz, res);
+                    raiz->der = crear_filtrado(clave, criterio, raiz->der);
+                    raiz->izq = crear_filtrado(clave, criterio, raiz->izq);
+                    
+                    if (es_vacio_binario(raiz->der)) {
+                        delete (raiz->der); //Si es vacio, lo borro porque me pedi memoria nueva mas arriba
+                        raiz->der = NULL;
+                    }
+                    if (es_vacio_binario(raiz->izq)){
+                        delete (raiz->izq); //mismo que derecha
+                        raiz->izq = NULL;
+                    }
                 }
-              mayor = buscador->dato;
-              remover_mayor(fizquierdo);
-              insertar_en_binario(mayor, res);
-              res->izq = fderecho;
-              res->der = fizquierdo;
-              return res;
             }
-          }
+            break;
         }
-        break;
-      }
-      case igual:{
-        if (b->dato = clave){
-
+        
+        case mayor { 
+            if (!es_vacio_binario(raiz)){
+                if (numero_info(raiz->dato) > clave){
+                    insertar_en_binario(raiz, res);
+                    raiz->der = crear_filtrado(clave, criterio, raiz->der);
+                    raiz->izq = crear_filtrado(clave, criterio, raiz->izq);
+                    
+                    if (es_vacio_binario(raiz->der)) {
+                        delete (raiz->der); //Si es vacio, lo borro porque me pedi memoria nueva mas arriba
+                        raiz->der = NULL;
+                    }
+                    if (es_vacio_binario(raiz->izq)){
+                        delete (raiz->izq); //mismo que derecha
+                        raiz->izq = NULL;
+                    }
+                }
+            }
+            break;
         }
-        break;
-      }
-      case menor:{
-        if (b->dato > clave){
-
+        
+        case igual {
+            if (!es_vacio_binario(raiz)){
+                if (numero_info(raiz->dato) == clave){
+                    insertar_en_binario(raiz, res);
+                    raiz->der = crear_filtrado(clave, criterio, raiz->der);
+                    raiz->izq = crear_filtrado(clave, criterio, raiz->izq);
+                    
+                    if (es_vacio_binario(raiz->der)) {
+                        delete (raiz->der); //Si es vacio, lo borro porque me pedi memoria nueva mas arriba
+                        raiz->der = NULL;
+                    }
+                    if (es_vacio_binario(raiz->izq)){
+                        delete (raiz->izq); //mismo que derecha
+                        raiz->izq = NULL;
+                    }
+                }
+            }
+            break;
         }
-        break;
-      }
+        
     }
 
-  }
-
+    return res;
 }
 
 bool es_vacio_binario(const binario b) {
