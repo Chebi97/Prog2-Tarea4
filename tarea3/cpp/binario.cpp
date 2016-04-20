@@ -83,6 +83,7 @@ info_t remover_mayor(binario &b) {
   return res;
 }
 
+
 binario crear_filtrado(const int clave, comp_t criterio, const binario b) {
 
   binario fderecho, fizquierdo, res;
@@ -250,6 +251,7 @@ nat cantidad_de_caminos(const lista l, const binario b) {
     if (numero_info(info_lista(inicio_lista(l), l)) == numero_info(b->dato)) {
       lista lTail = segmento_lista(siguiente(inicio_lista(l), l), final_lista(l), l);
       res = cantidad_de_caminos(lTail, b->der) + cantidad_de_caminos(lTail, b->izq);
+      liberar_lista(lTail);
     }
   } else if (es_vacia_lista(l) && es_vacio_binario(b)) {
     res = 1;
@@ -294,61 +296,60 @@ texto_t camino_a_texto(const camino_t c) {
   return res;
 }
 
-static camino_t buscar_camino_aux(const lista l, const binario b, camino_t c);
-
-camino_t buscar_camino_aux(const lista l, const binario b, camino_t c) {
-
-    if (!es_vacia_lista(l) && !es_vacio_binario(b)) {
-      if (texto_info(info_lista(inicio_lista(l), l)) == texto_info(b->dato)) {
+static camino_t buscar_camino_aux(const lista l, const binario b, camino_t c) {
+  if (!es_vacia_lista(l) && !es_vacio_binario(b)) {
+    if (texto_info(info_lista(inicio_lista(l), l)) == texto_info(b->dato)) {
+      if (siguiente(inicio_lista(l), l) != NULL) {
         lista lTail = segmento_lista(siguiente(inicio_lista(l), l), final_lista(l), l);
-        if (!es_vacia_lista(lTail)) {
-          if (texto_info(info_lista(inicio_lista(lTail),l)) > texto_info(b->dato)) {
-            c.ramas[c.cantidad_ramas] = der;
-            c.cantidad_ramas++;
-            buscar_camino_aux(lTail, b->der, c);
-          } else {
-            c.ramas[c.cantidad_ramas] = izq;
-            c.cantidad_ramas++;
-            buscar_camino_aux(lTail, b->izq, c);
-          }
+        if (texto_info(info_lista(inicio_lista(lTail),l)) > texto_info(b->dato)) {
+          c.ramas[c.cantidad_ramas] = der;
+          c.cantidad_ramas++;
+          buscar_camino_aux(lTail, b->der, c);
+        } else {
+          c.ramas[c.cantidad_ramas] = izq;
+          c.cantidad_ramas++;
+          buscar_camino_aux(lTail, b->izq, c);
+        }
+        liberar_lista(lTail);
+      } else {
+        if (b->der == NULL && b->izq == NULL) {
+          c.existe = true;
         }
       }
-    } else if (!es_vacia_lista(l) && !es_vacio_binario(b)) {
-      c.existe = true;
     }
-    return c;
   }
+  return c;
+}
 
 camino_t buscar_camino(const lista l, const binario b) {
   camino_t res;
   res.existe = false;
   res.cantidad_ramas = 0;
 
-  res = buscar_camino_aux(l, b, res);
-
+  if (!es_vacia_lista(l) && !es_vacio_binario(b)) {
+    res = buscar_camino_aux(l, b, res);
+  }
   return res;
 }
 
-static void imprimir_binario_aux(const binario b, nat a);
-
-void imprimir_binario_aux(const binario b, nat a) {
+static void imprimir_binario_aux(const binario b, nat a) {
   if (!es_vacio_binario(b)) {
       if (b->izq == NULL && b->der == NULL) {
         for (nat i = 0; i < a; i++)
           printf("%c", "-");
         escribir_texto(info_a_texto(b->dato));
         printf("\n");
-        a--;
       } else if (b->der == NULL) {
         for (nat i = 0; i < a; i++)
           printf("%c", "-");
         escribir_texto(info_a_texto(b->dato));
         printf("\n");
         a++;
-        imprimir_binario(b->izq);
+        imprimir_binario_aux(b->izq, a);
+        a--;
       } else if (b->izq == NULL) {
         a++;
-        imprimir_binario(b->der);
+        imprimir_binario_aux(b->der, a);
         a--;
         for (nat i = 0; i < a; i++)
           printf("%c", "-");
@@ -356,7 +357,7 @@ void imprimir_binario_aux(const binario b, nat a) {
         printf("\n");
       } else {
         a++;
-        imprimir_binario(b->der);
+        imprimir_binario_aux(b->der, a);
         a--;
         nat i = 0;
         for (nat i = 0; i < a; i++)
@@ -364,12 +365,11 @@ void imprimir_binario_aux(const binario b, nat a) {
         escribir_texto(info_a_texto(b->dato));
         printf("\n");
         a++;
-        imprimir_binario(b->izq);
+        imprimir_binario_aux(b->izq, a);
         a--;
       }
     }
 }
-
 
 void imprimir_binario(const binario b) {
   imprimir_binario_aux(b, 0);
