@@ -4,10 +4,14 @@
   InCo-FIng-UDELAR
  */
 
+/*Daniel Susviela 4894156-5
+Sebastian Guerrero 5092132-1*/
+
 #include "../include/lista.h"
 #include "../include/info.h"
 
 #include <stddef.h>
+#include <stdio.h>
 
 // nodo con punteros al anterior y al siguiente
 struct nodo {
@@ -170,28 +174,43 @@ void mover_antes(localizador loc1, localizador loc2, lista &lst) {
 
 
 void insertar_segmento_despues(lista &sgm, const localizador loc, lista &lst) {
-  if (es_vacia_lista) {
-    lst = sgm;
+  if (es_vacia_lista(lst)) {
+    lst->inicio = sgm->inicio;
+    lst->final = sgm->final;
   }
   else {
-    loc->siguiente->anterior = sgm->final;
-    sgm->final->siguiente = loc->siguiente;
-    loc->siguiente = sgm->inicio;
-    sgm->inicio->anterior = loc;
+    if(!es_vacia_lista(sgm)){
+      if(!es_final_lista(loc, lst)) {
+        loc->siguiente->anterior = sgm->final;
+      } else {
+        lst->final = sgm->final;
+      }
+      sgm->final->siguiente = loc->siguiente;
+      loc->siguiente = sgm->inicio;
+      sgm->inicio->anterior = loc;
+    }
   }
   sgm->inicio = NULL;
-  sgm->final = NUL;
+  sgm->final = NULL;
 }
 
 lista separar_segmento(localizador desde, localizador hasta, lista &lst) {
-  lista res = NULL;
-  if (!es_lista_vacia(lst)) {
+  lista res = crear_lista();
+
+  if (!es_vacia_lista(lst)) {
     res->inicio = desde;
     res->final = hasta;
 
-    desde->anterior->siguiente = hasta->siguiente;
-    hasta->siguiente->anterior = desde->anterior;
-
+    if (!es_inicio_lista(desde, lst)) {
+      desde->anterior->siguiente = hasta->siguiente;
+    } else {
+      lst->inicio = hasta->siguiente;
+    }
+    if (!es_final_lista(hasta, lst)) {
+      hasta->siguiente->anterior = desde->anterior;
+    } else {
+      lst->final = desde->anterior;
+    }
     res->inicio->anterior = NULL;
     res->final->siguiente = NULL;
   }
@@ -199,33 +218,43 @@ lista separar_segmento(localizador desde, localizador hasta, lista &lst) {
 }
 
 void remover_de_lista(localizador &loc, lista &lst) {
-  delete[] loc->dato->texto->caracteres;
-  loc->siguiente->anterior = loc->anterior;
-  loc->anterior->siguiente = loc->siguiente;
-  delete loc;
+  if (!es_vacia_lista(lst)) {
+    info_t aux = info_lista(loc, lst);
+    liberar_info(aux);
+
+    if (loc == lst->inicio && loc == lst->final) {
+      lst->inicio = NULL;
+      lst->final = NULL;
+    } else
+      if (loc == lst->inicio) {
+        lst->inicio = lst->inicio->siguiente;
+        loc->siguiente->anterior = NULL;
+      } else
+        if (loc == lst->final) {
+          lst->final = lst->final->anterior;
+          loc->anterior->siguiente = NULL;
+        } else {
+          loc->siguiente->anterior = loc->anterior;
+          loc->anterior->siguiente = loc->siguiente;
+        }
+    delete loc;
+    loc = NULL;
+  }
 }
 
 void liberar_lista(lista &lst) {
-  if (!es_vacia_lista(lst)) {
+ localizador primero = lst->inicio;
 
-    localizador aux = lst->inicio;
-    delete[] aux->dato->texto->caracteres;
-
-    while (siguiente(aux, lst) != NULL) {
-      aux = siguiente(aux, lst);
-      delete[] aux->dato->texto->caracteres;
-      delete aux->anterior->siguiente;
-      delete aux->anterior;
-    }
-    delete aux;
-    delete lst->inicio;
-    delete lst->final;
+  while (primero != NULL) {
+    remover_de_lista(primero, lst);
+    primero = lst->inicio;
   }
   delete lst;
+  lst = NULL;
 }
 
 bool es_vacia_lista(const lista lst) {
-  bool res = lst->inicio == NULL;
+  bool res = inicio_lista(lst) == NULL;
 
   return res;
 }
@@ -270,9 +299,10 @@ localizador anterior(const localizador loc, const lista lst) {
 bool precede_en_lista(const localizador l1, const localizador l2,
                    const lista lst) {
   bool res = l1 == l2;
-  while ( && l1->siguiente != NULL) {
-    l1 = siguiente(l1, lst);
-    res = l1 == l2;
+  localizador cursor = l1;
+  while (cursor != NULL && !res) {
+    cursor = siguiente(cursor, lst);
+    res = cursor == l2;
   }
   return res;
 }
@@ -292,4 +322,3 @@ void intercambiar(const localizador loc1, const localizador loc2, lista &lst) {
   loc1->dato = loc2->dato;
   loc2->dato = aux;
 }
-
