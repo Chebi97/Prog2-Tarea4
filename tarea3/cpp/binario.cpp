@@ -83,115 +83,81 @@ info_t remover_mayor(binario &b) {
   return res;
 }
 
+static binario cons(info_t i, binario izq, binario der) {
+  binario res = crear_binario();
+  res->dato = i;
+  res->izq = izq;
+  res->der = der;
+  return res;
+}
 
 binario crear_filtrado(const int clave, comp_t criterio, const binario b) { 
-//habria que revisar en realidad, con analizar uno de los casos del swithc alcanza, los demas son analogos
-   
 
-  binario res = crear_binario();
-  binario fderecho, fizquierdo, raiz;
+  binario res;
+  binario fder, fizq;
+  info_t mayor, raiz;
 
-  raiz = b; //necesario raiz??
-
-  switch (criterio){
-
-    case menor {
-      if (!es_vacio_binario(raiz)){
-        if (numero_info(raiz->dato) < clave){
-          insertar_en_binario(raiz->dato, res);
-          raiz->der = crear_filtrado(clave, criterio, raiz->der);
-          raiz->izq = crear_filtrado(clave, criterio, raiz->izq);
-
-          if (es_vacio_binario(raiz->der)) {
-              delete (raiz->der); //Si es vacio, lo borro porque me pedi memoria nueva mas arriba
-              raiz->der = NULL;
-          }
-          if (es_vacio_binario(raiz->izq)){
-              delete (raiz->izq); //mismo que derecha
-              raiz->izq = NULL;
-          }
+  if (!es_vacio_binario(b)) {
+    fizq = crear_filtrado(clave, criterio, b->izq);
+    fder = crear_filtrado(clave, criterio, b->der);
+    raiz = b->dato;
+    switch (criterio){
+      case menor: {
+        if (numero_info(raiz) < clave) {
+          res = cons(raiz, fizq, fder);
+        } else if (es_vacio_binario(fizq)) {
+          liberar_binario(fizq);
+          fizq = NULL;
+          res = fder;
+        } else if (es_vacio_binario(fder)) {
+          liberar_binario(fder);
+          fder = NULL;
+          res = fizq;
         } else {
-          raiz->der = crear_filtrado(clave, criterio, raiz->der);
-          raiz->izq = crear_filtrado(clave, criterio, raiz->izq);
-
-          if (es_vacio_binario(raiz->der)) {
-              delete (raiz->der); //Si es vacio, lo borro porque me pedi memoria nueva mas arriba
-              raiz->der = NULL;
-          }
-          if (es_vacio_binario(raiz->izq)){
-              delete (raiz->izq); //mismo que derecha
-              raiz->izq = NULL;
-          }
+          mayor = remover_mayor(fizq);
+          res = cons(mayor, fizq, fder);
         }
+        break;
       }
+      case mayor: {
+        if (numero_info(raiz) > clave) {
+          res = cons(raiz, fizq, fder);
+        } else if (es_vacio_binario(fizq)) {
+          liberar_binario(fizq);
+          fizq = NULL;
+          res = fder;
+        } else if (es_vacio_binario(fder)) {
+          liberar_binario(fder);
+          fder = NULL;
+          res = fizq;
+        } else {
+          mayor = remover_mayor(fizq);
+          res = cons(raiz, fizq, fder);
+        }
+        break;
+      }
+      case igual: {
+        if (numero_info(raiz) == clave) {
+          res = cons(raiz, fizq, fder);
+        } else if (es_vacio_binario(fizq)) {
+          liberar_binario(fizq);
+          fizq = NULL;
+          res = fder;
+        } else if (es_vacio_binario(fder)) {
+          liberar_binario(fder);
+          fder = NULL;
+          res = fizq;
+        } else {
+          mayor = remover_mayor(fizq);
+          res = cons(raiz, fizq, fder);
+        }
       break;
-    }
-
-    case mayor { 
-      if (!es_vacio_binario(raiz)){
-        if (numero_info(raiz->dato) > clave){
-          insertar_en_binario(raiz-dato, res);
-          raiz->der = crear_filtrado(clave, criterio, raiz->der);
-          raiz->izq = crear_filtrado(clave, criterio, raiz->izq);
-
-          if (es_vacio_binario(raiz->der)) {
-            delete (raiz->der); //Si es vacio, lo borro porque me pedi memoria nueva mas arriba
-            raiz->der = NULL;
-          }
-          if (es_vacio_binario(raiz->izq)){
-            delete (raiz->izq); //mismo que derecha
-            raiz->izq = NULL;
-          }
-        } else {
-          raiz->der = crear_filtrado(clave, criterio, raiz->der);
-          raiz->izq = crear_filtrado(clave, criterio, raiz->izq);
-
-          if (es_vacio_binario(raiz->der)) {
-            delete (raiz->der); //Si es vacio, lo borro porque me pedi memoria nueva mas arriba
-            raiz->der = NULL;
-          }
-          if (es_vacio_binario(raiz->izq)){
-            delete (raiz->izq); //mismo que derecha
-            raiz->izq = NULL;
-          }
-        }
       }
-      break;
     }
-
-    case igual {
-      if (!es_vacio_binario(raiz)){
-        if (numero_info(raiz->dato) == clave){
-          insertar_en_binario(raiz->dato, res);
-          raiz->der = crear_filtrado(clave, criterio, raiz->der);
-          raiz->izq = crear_filtrado(clave, criterio, raiz->izq);
-
-          if (es_vacio_binario(raiz->der)) {
-            delete (raiz->der); //Si es vacio, lo borro porque me pedi memoria nueva mas arriba
-            raiz->der = NULL;
-          }
-          if (es_vacio_binario(raiz->izq)){
-            delete (raiz->izq); //mismo que derecha
-            raiz->izq = NULL;
-          }
-        } else {
-          raiz->der = crear_filtrado(clave, criterio, raiz->der);
-          raiz->izq = crear_filtrado(clave, criterio, raiz->izq);
-
-          if (es_vacio_binario(raiz->der)) {
-            delete (raiz->der); //Si es vacio, lo borro porque me pedi memoria nueva mas arriba
-            raiz->der = NULL;
-          }
-          if (es_vacio_binario(raiz->izq)){
-            delete (raiz->izq); //mismo que derecha
-            raiz->izq = NULL;
-          }
-        }
-      }
-    break;
-    }
+  } else {
+    res = crear_binario();
   }
-  return res;
+    return res;
 }
 
 bool es_vacio_binario(const binario b) {
@@ -297,12 +263,16 @@ nat cantidad_de_caminos(const lista l, const binario b) {
   nat res = 0;
   if (!es_vacia_lista(l) && !es_vacio_binario(b)) {
     if (numero_info(info_lista(inicio_lista(l), l)) == numero_info(b->dato)) {
-      lista lTail = segmento_lista(siguiente(inicio_lista(l), l), final_lista(l), l);
-      res = cantidad_de_caminos(lTail, b->der) + cantidad_de_caminos(lTail, b->izq);
-      liberar_lista(lTail);
+      if (siguiente(inicio_lista(l), l) != NULL) {
+        lista lTail = segmento_lista(siguiente(inicio_lista(l), l), final_lista(l), l);
+        res = cantidad_de_caminos(lTail, b->der) + cantidad_de_caminos(lTail, b->izq);
+        liberar_lista(lTail);
+      } else {
+        if (b->der == NULL && b->izq == NULL) {
+          res = 1;
+        }
+      }
     }
-  } else if (es_vacia_lista(l) && es_vacio_binario(b)) {
-    res = 1;
   }
   return res;
 }
@@ -373,9 +343,13 @@ camino_t buscar_camino(const lista l, const binario b) {
   camino_t res;
   res.existe = false;
   res.cantidad_ramas = 0;
+  res.ramas = new array_rama[longitud(l) - 1];
 
   if (!es_vacia_lista(l) && !es_vacio_binario(b)) {
     res = buscar_camino_aux(l, b, res);
+  }
+  if (res.existe == false) {
+    delete[] res.ramas;
   }
   return res;
 }
