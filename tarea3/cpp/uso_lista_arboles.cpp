@@ -240,11 +240,43 @@ void imprimir_lista(const lista lst) {
   }
   printf("\n");
 }
-/*
+//auxiliar para kesimo
+void pasar_binario_alista(const binario b, lista &l){
+  
+  if (!es_vacio_binario(b)){
+    insertar_antes(raiz_binario(b), final_lista(l), l);
+    if (izquierdo(b) != NULL){
+      b= izquierdo(b);
+      pasar_binario_alista(b, l);
+      if (derecho(b) != NULL){
+        b = derecho(b);
+        pasar_binario_alista(b, l);
+      }
+    } else {
+      if (derecho(b) != NULL){
+        b=derecho(b);
+        pasar_binario_alista(b, l);
+      }
+    }
+  }
+  
+
+}
 
 binario kesimo_subarbol(const nat k, const binario b) {
+//asumo que comparte memoria
+  lista listabinario = crear_lista();
+  pasar_binario_alista(b, listabinario);
+  ordenar(listabinario);
+  localizador kesima_raiz = inicio_lista(l);
+  for(nat j=0; j<= k, j++){
+      kesima_raiz = siguiente(kesima_raiz, listabinario);
+  }
+  res = buscar_subarbol(texto_info(info_lista(kesima_raiz)), b);
+  liberar_lista(listabinario);
+  return res;
+
 }
-*/
 void imprimir_finitario(const finitario f) {
 
   nat altura = altura_finitario(f);
