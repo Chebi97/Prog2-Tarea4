@@ -1,5 +1,6 @@
 /*
   Módulo de implementación de 'info'.
+
   Laboratorio de Programación 2.
   InCo-FIng-UDELAR
  */
@@ -16,39 +17,27 @@ struct rep_info {
   texto_t texto;
 };
 
-
 info_t crear_info(const int n, const texto_t t) {
   info_t res = new rep_info;
-
   res->numero = n;
   res->texto = t;
-
   return res;
+}
+
+info_t copiar_info(const info_t i) {
+  return crear_info(i->numero, copiar_texto(i->texto));
 }
 
 void liberar_info(info_t &i) {
   liberar_texto(i->texto);
-  delete i;
+  delete (i);
 }
 
-int numero_info(const info_t i) {
-  int res = i->numero;
+int numero_info(const info_t i) { return i->numero; }
 
-  return res;
-}
+texto_t texto_info(const info_t i) { return i->texto; }
 
-texto_t texto_info(const info_t i) {
-  texto_t res = i->texto;
-
-  return res;
-}
-
-bool es_valida_info(const info_t i) {
-  bool res = !(i->numero == INT_MAX);
-
-  return res;
-}
-
+bool es_valida_info(const info_t i) { return i->numero != INT_MAX; }
 
 /*
   Devuelve un texto_t formado por la concatenacion del dato numerico de `i`,
@@ -101,12 +90,12 @@ info_t leer_info(nat max) {
   if (abre != '(') {
     // Si el primer símbolo NO es un paréntesis de apertura entonces lo que
     // se está leyendo no cumple el formato.
-    res = crear_info(INT_MAX, cadena_a_texto(""));
+    res = crear_info(INT_MAX, texto_vacio());
   } else {
     // busca un entero (que aloja en `num`), una coma, una cadena que no
     // incluya el paréntesis de cierre (que aloja en `cadena`) y un
     // paréntesis de cierre.
-    scanf("%d,%[^)]) )", &num, cadena);
+    scanf("%d,%[^)]) ", &num, cadena);
     res = crear_info(num, cadena_a_texto(cadena));
   }
   return res;

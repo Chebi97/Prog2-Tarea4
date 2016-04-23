@@ -3,12 +3,13 @@
 #include "../include/info.h"
 #include "../include/lista.h"
 #include "../include/binario.h"
+#include "../include/uso_lista_arboles.h"
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
-#include <algorithm.h>
+#include <algorithm>
 
 struct rep_binario {
   info_t dato;
@@ -20,7 +21,7 @@ binario crear_binario() {
 
   binario res = new rep_binario;
 
-  res->dato = new rep_texto;
+  res->dato = NULL;
   res->izq = NULL;
   res->der = NULL;
 
@@ -95,7 +96,7 @@ binario crear_filtrado(const int clave, comp_t criterio, const binario b) {
 
   binario res;
   binario fder, fizq;
-  info_t mayor, raiz;
+  info_t imayor, raiz;
 
   if (!es_vacio_binario(b)) {
     fizq = crear_filtrado(clave, criterio, b->izq);
@@ -114,8 +115,8 @@ binario crear_filtrado(const int clave, comp_t criterio, const binario b) {
           fder = NULL;
           res = fizq;
         } else {
-          mayor = remover_mayor(fizq);
-          res = cons(mayor, fizq, fder);
+          imayor = remover_mayor(fizq);
+          res = cons(imayor, fizq, fder);
         }
         break;
       }
@@ -131,8 +132,8 @@ binario crear_filtrado(const int clave, comp_t criterio, const binario b) {
           fder = NULL;
           res = fizq;
         } else {
-          mayor = remover_mayor(fizq);
-          res = cons(raiz, fizq, fder);
+          imayor = remover_mayor(fizq);
+          res = cons(imayor, fizq, fder);
         }
         break;
       }
@@ -148,8 +149,8 @@ binario crear_filtrado(const int clave, comp_t criterio, const binario b) {
           fder = NULL;
           res = fizq;
         } else {
-          mayor = remover_mayor(fizq);
-          res = cons(raiz, fizq, fder);
+          imayor = remover_mayor(fizq);
+          res = cons(imayor, fizq, fder);
         }
       break;
       }
@@ -203,6 +204,8 @@ void liberar_binario(binario &b) {
     info_t aux = remover_mayor(b);
     liberar_info(aux);
     liberar_binario(b);
+  } else {
+    delete b;
   }
 }
 
@@ -343,7 +346,7 @@ camino_t buscar_camino(const lista l, const binario b) {
   camino_t res;
   res.existe = false;
   res.cantidad_ramas = 0;
-  res.ramas = new array_rama[longitud(l) - 1];
+  res.ramas = new rama_t[longitud(l) - 1];
 
   if (!es_vacia_lista(l) && !es_vacio_binario(b)) {
     res = buscar_camino_aux(l, b, res);
@@ -358,12 +361,12 @@ static void imprimir_binario_aux(const binario b, nat a) {
   if (!es_vacio_binario(b)) {
       if (b->izq == NULL && b->der == NULL) {
         for (nat i = 0; i < a; i++)
-          printf("%c", "-");
+          printf("%s", "-");
         escribir_texto(info_a_texto(b->dato));
         printf("\n");
       } else if (b->der == NULL) {
         for (nat i = 0; i < a; i++)
-          printf("%c", "-");
+          printf("%s", "-");
         escribir_texto(info_a_texto(b->dato));
         printf("\n");
         a++;
@@ -374,16 +377,15 @@ static void imprimir_binario_aux(const binario b, nat a) {
         imprimir_binario_aux(b->der, a);
         a--;
         for (nat i = 0; i < a; i++)
-          printf("%c", "-");
+          printf("%s", "-");
         escribir_texto(info_a_texto(b->dato));
         printf("\n");
       } else {
         a++;
         imprimir_binario_aux(b->der, a);
         a--;
-        nat i = 0;
         for (nat i = 0; i < a; i++)
-          printf("%c", "-");
+          printf("%s", "-");
         escribir_texto(info_a_texto(b->dato));
         printf("\n");
         a++;
@@ -396,5 +398,3 @@ static void imprimir_binario_aux(const binario b, nat a) {
 void imprimir_binario(const binario b) {
   imprimir_binario_aux(b, 0);
 }
-
-

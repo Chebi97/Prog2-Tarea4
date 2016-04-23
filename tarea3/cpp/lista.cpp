@@ -1,13 +1,12 @@
 /*
   Módulo de implementación de 'lista'.
+
   Laboratorio de Programación 2.
   InCo-FIng-UDELAR
  */
 
-/*Daniel Susviela 4894156-5
-Sebastian Guerrero 5092132-1*/
-
 #include "../include/lista.h"
+#include "../include/texto.h"
 #include "../include/info.h"
 
 #include <stddef.h>
@@ -53,24 +52,6 @@ void insertar_antes(const info_t i, const localizador loc, lista &lst) {
   }
 }
 
-void insertar_despues(const info_t i, const localizador loc, lista &lst) {
-  nodo *nuevo = new nodo;
-  nuevo->dato = i;
-  if (es_vacia_lista(lst)) {
-    lst->inicio = lst->final = nuevo;
-    nuevo->anterior = nuevo->siguiente = NULL;
-  } else {
-    nuevo->anterior = loc;
-    nuevo->siguiente = loc->siguiente;
-    loc->siguiente = nuevo;
-
-    if (loc == lst->final)
-      lst->final = nuevo;
-    else
-      nuevo->siguiente->anterior = nuevo;
-  }
-}
-
 lista segmento_lista(const localizador desde, const localizador hasta,
                      const lista lst) {
   lista res = crear_lista();
@@ -84,8 +65,12 @@ lista segmento_lista(const localizador desde, const localizador hasta,
       // info_t info = crear_info(numero_info(loc->dato),
       // texto_info(loc->dato));
 
+      /* Con el constructor copiar_info ya no hace flata
       info_t info = crear_info(numero_info(loc->dato),
                                copiar_texto(texto_info(loc->dato)));
+      */
+
+      info_t info = copiar_info(loc->dato);
       insertar_despues(info, final_lista(res), res);
       loc = siguiente(loc, lst);
     }
@@ -125,26 +110,27 @@ localizador siguiente_clave(const int clave, const localizador loc,
   return res;
 }
 
-localizador anterior_clave(const int clave, const localizador loc,
-                           const lista lst) {
-  localizador res;
-  if (es_vacia_lista(lst)){
-    res = NULL;
-  }
-  else {
-    res = loc;
-    bool encontrado = false;
-    while ((!encontrado) && (res != NULL)) {
-      if (numero_info(res->dato) == clave) {
-        encontrado = true;
-      }
-      else
-        res = res->anterior;
-    }
-  }
-  return res;
+info_t info_lista(const localizador loc, const lista lst) {
+  // Se devuelve el elemento, no una copia de él.
+  return loc->dato;
 }
 
+void cambiar_en_lista(const info_t i, const localizador loc, lista &lst) {
+  // el elemento que estaba en el nodo debe ser referenciado antes desde la
+  // función que llama para que no quede memoria perdida:
+  // info_t info = info_lista(loc, lst);
+  // cambiar_en_lista(i, loc, lst);
+  // utilizar, tal vez liberar `info`
+  loc->dato = i;
+}
+
+void intercambiar(const localizador loc1, const localizador loc2, lista &lst) {
+  // Solo se intercambian los elementos. El orden relativo de los nodos se
+  // mantiene igual y los localizadores siguen apuntando a los mismos nodos.
+  info_t temp = loc1->dato;
+  loc1->dato = loc2->dato;
+  loc2->dato = temp;
+}
 
 void mover_antes(localizador loc1, localizador loc2, lista &lst) {
   // En esta versión no se solicita memoria para crear nodos, sino que
@@ -172,6 +158,24 @@ void mover_antes(localizador loc1, localizador loc2, lista &lst) {
   }
 }
 
+
+void insertar_despues(const info_t i, const localizador loc, lista &lst) {
+  nodo *nuevo = new nodo;
+  nuevo->dato = i;
+  if (es_vacia_lista(lst)) {
+    lst->inicio = lst->final = nuevo;
+    nuevo->anterior = nuevo->siguiente = NULL;
+  } else {
+    nuevo->anterior = loc;
+    nuevo->siguiente = loc->siguiente;
+    loc->siguiente = nuevo;
+
+    if (loc == lst->final)
+      lst->final = nuevo;
+    else
+      nuevo->siguiente->anterior = nuevo;
+  }
+}
 
 void insertar_segmento_despues(lista &sgm, const localizador loc, lista &lst) {
   if (es_vacia_lista(lst)) {
@@ -218,7 +222,7 @@ lista separar_segmento(localizador desde, localizador hasta, lista &lst) {
 }
 
 void remover_de_lista(localizador &loc, lista &lst) {
-  if (!es_vacia_lista(lst)) {
+  if (!es_vacia_lista(lst) && localizador_pertenece_a_lista (loc, lst)) {
     info_t aux = info_lista(loc, lst);
     liberar_info(aux);
 
@@ -228,11 +232,13 @@ void remover_de_lista(localizador &loc, lista &lst) {
     } else
       if (loc == lst->inicio) {
         lst->inicio = lst->inicio->siguiente;
-        loc->siguiente->anterior = NULL;
+        lst->inicio->anterior = NULL;
+        //loc->siguiente->anterior = NULL;
       } else
         if (loc == lst->final) {
           lst->final = lst->final->anterior;
-          loc->anterior->siguiente = NULL;
+          lst->final->siguiente = NULL;
+          //loc->anterior->siguiente = NULL;
         } else {
           loc->siguiente->anterior = loc->anterior;
           loc->anterior->siguiente = loc->siguiente;
@@ -252,7 +258,6 @@ void liberar_lista(lista &lst) {
   delete lst;
   lst = NULL;
 }
-
 bool es_vacia_lista(const lista lst) {
   bool res = inicio_lista(lst) == NULL;
 
@@ -270,7 +275,6 @@ bool es_final_lista(const localizador loc, const lista lst) {
 
   return res;
 }
-
 
 localizador inicio_lista(const lista lst) {
   localizador res = lst->inicio;
@@ -307,18 +311,22 @@ bool precede_en_lista(const localizador l1, const localizador l2,
   return res;
 }
 
-info_t info_lista(const localizador loc, const lista lst) {
-  info_t res = loc->dato;
-
+localizador anterior_clave(const int clave, const localizador loc,
+                           const lista lst) {
+  localizador res;
+  if (es_vacia_lista(lst)){
+    res = NULL;
+  }
+  else {
+    res = loc;
+    bool encontrado = false;
+    while ((!encontrado) && (res != NULL)) {
+      if (numero_info(res->dato) == clave) {
+        encontrado = true;
+      }
+      else
+        res = res->anterior;
+    }
+  }
   return res;
-}
-
-void cambiar_en_lista(const info_t i, const localizador loc, lista &lst) {
-  loc->dato = i;
-}
-
-void intercambiar(const localizador loc1, const localizador loc2, lista &lst) {
-  info_t aux = loc1->dato;
-  loc1->dato = loc2->dato;
-  loc2->dato = aux;
 }
