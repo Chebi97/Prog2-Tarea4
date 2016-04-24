@@ -1,5 +1,6 @@
 /*
   Módulo de implementación de 'texto'.
+
   Laboratorio de Programación 2.
   InCo-FIng-UDELAR
  */
@@ -85,10 +86,18 @@ texto_t leer_palabra(const nat max) {
 
 texto_t leer_resto_linea(const nat max) {
   texto_t res = new rep_texto;
+
+  /* Se reserva un espacio extra para el carácter de fin de cadena.*/
   res->caracteres = new char[max + 1];
 
+  /* stdin es la entrada estándar.
+     fgets lee `max - 1` caracteres o hasta enconrtrar el fin de línea (o fin
+     de archivo) y los almacena en `res->caracteres`.
+     Ver http://www.cplusplus.com/reference/cstdio/fgets/
+  */
   fgets(res->caracteres, max, stdin);
 
+  /* Se sustituye el carácter de fin de linea ('\n') por el de fin de cadena. */
   res->caracteres[strlen(res->caracteres) - 1] = '\0';
 
   return res;
@@ -134,6 +143,9 @@ comp_t comparar_texto(const texto_t t1, const texto_t t2) {
 int texto_a_int(const texto_t t) { return (nat)atoi(t->caracteres); }
 
 texto_t int_a_texto(const int i) {
+  /* Con 10 caracteres se puede representar hasta el 9.999.999.999, que es
+     mayor que 2^34, mientras que con cuatro bytes solo se puede representar
+     desde -2^{31} (- 2 a la 31) hasta 2^{31} - 1 (2 a la 31 - 1).  */
   char caracteres[11];
 
   /* Se "imprime" `i` en el array `caracteres`.*/
@@ -148,9 +160,10 @@ void liberar_texto(texto_t &t) {
   /* Se libera la memoria pedida para el array `caracteres`, por ejemplo
      res->caracteres = new char[max+1];
      en leer_resto_linea.  */
-  delete[] t->caracteres;
-
-  /* Se libera la memoria pedida para `t`, por ejemplo
+    delete[] t->caracteres;
+   /* Se libera la memoria pedida para `t`, por ejemplo
      texto_t res = new rep_texto;  */
-  delete t;
+  
+    delete t;
+ 
 }

@@ -12,7 +12,9 @@ Sebastian Guerrero 5092132-1*/
 #include "../include/texto.h"
 #include "../include/info.h"
 #include "../include/lista.h"
-#include "../include/uso_lista.h"
+#include "../include/binario.h"
+#include "../include/finitario.h"
+#include "../include/uso_lista_arboles.h"
 
 #include <stddef.h>
 #include <stdio.h>
@@ -243,23 +245,11 @@ void imprimir_lista(const lista lst) {
 //auxiliar para kesimo
 void pasar_binario_alista(const binario b, lista &l){
   
-  if (!es_vacio_binario(b)){
-    insertar_antes(raiz_binario(b), final_lista(l), l);
-    if (izquierdo(b) != NULL){
-      b= izquierdo(b);
-      pasar_binario_alista(b, l);
-      if (derecho(b) != NULL){
-        b = derecho(b);
-        pasar_binario_alista(b, l);
-      }
-    } else {
-      if (derecho(b) != NULL){
-        b=derecho(b);
-        pasar_binario_alista(b, l);
-      }
-    }
+  if (b!=NULL && !es_vacio_binario(b)){
+    pasar_binario_alista(izquierdo(b), l);
+    insertar_despues(raiz_binario(b), final_lista(l), l);
+    pasar_binario_alista(derecho(b), l);
   }
-  
 
 }
 
@@ -267,26 +257,25 @@ binario kesimo_subarbol(const nat k, const binario b) {
 //asumo que comparte memoria
   lista listabinario = crear_lista();
   pasar_binario_alista(b, listabinario);
-  ordenar(listabinario);
-  localizador kesima_raiz = inicio_lista(l);
-  for(nat j=0; j<= k, j++){
+  localizador kesima_raiz = inicio_lista(listabinario);
+  for(nat j=1; j< k; j++){ 
       kesima_raiz = siguiente(kesima_raiz, listabinario);
   }
-  res = buscar_subarbol(texto_info(info_lista(kesima_raiz)), b);
-  liberar_lista(listabinario);
+  binario res = buscar_subarbol(texto_info(info_lista(kesima_raiz, listabinario)), b);
   return res;
 
 }
+
 void imprimir_finitario(const finitario f) {
 
   nat altura = altura_finitario(f);
-  nat i;
-  lista imprimir = crear_lista():
-  while (i <= altura){
+  lista imprimir = crear_lista();
+  for (nat i = 1; i <= altura; i++) {
     imprimir = nivel(i, f);
     imprimir_lista(imprimir);
-    liberar_lista(imprimir);
   }
+  if (es_vacio_finitario(f)){printf("\n");}
+  liberar_lista(imprimir);
 }
 
 

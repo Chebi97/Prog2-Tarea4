@@ -1,0 +1,127 @@
+2a3
+> 
+7,9d7
+< /*Daniel Susviela 4894156-5
+< Sebastian Guerrero 5092132-1*/
+< 
+11d8
+< #include "../include/info.h"
+12a10
+> #include "../include/info.h"
+15d12
+< #include <stdio.h>
+57,74d53
+< void insertar_despues(const info_t i, const localizador loc, lista &lst) {
+<   nodo *nuevo = new nodo;
+<   nuevo->dato = i;
+<   if (es_vacia_lista(lst)) {
+<     lst->inicio = lst->final = nuevo;
+<     nuevo->anterior = nuevo->siguiente = NULL;
+<   } else {
+<     nuevo->anterior = loc;
+<     nuevo->siguiente = loc->siguiente;
+<     loc->siguiente = nuevo;
+< 
+<     if (loc == lst->final)
+<       lst->final = nuevo;
+<     else
+<       nuevo->siguiente->anterior = nuevo;
+<   }
+< }
+< 
+133,150c112,114
+< localizador anterior_clave(const int clave, const localizador loc,
+<                            const lista lst) {
+<   localizador res;
+<   if (es_vacia_lista(lst)){
+<     res = NULL;
+<   }
+<   else {
+<     res = loc;
+<     bool encontrado = false;
+<     while ((!encontrado) && (res != NULL)) {
+<       if (numero_info(res->dato) == clave) {
+<         encontrado = true;
+<       }
+<       else
+<         res = res->anterior;
+<     }
+<   }
+<   return res;
+---
+> info_t info_lista(const localizador loc, const lista lst) {
+>   // Se devuelve el elemento, no una copia de él.
+>   return loc->dato;
+152a117,132
+> void cambiar_en_lista(const info_t i, const localizador loc, lista &lst) {
+>   // el elemento que estaba en el nodo debe ser referenciado antes desde la
+>   // función que llama para que no quede memoria perdida:
+>   // info_t info = info_lista(loc, lst);
+>   // cambiar_en_lista(i, loc, lst);
+>   // utilizar, tal vez liberar `info`
+>   loc->dato = i;
+> }
+> 
+> void intercambiar(const localizador loc1, const localizador loc2, lista &lst) {
+>   // Solo se intercambian los elementos. El orden relativo de los nodos se
+>   // mantiene igual y los localizadores siguen apuntando a los mismos nodos.
+>   info_t temp = loc1->dato;
+>   loc1->dato = loc2->dato;
+>   loc2->dato = temp;
+> }
+180a161,178
+> void insertar_despues(const info_t i, const localizador loc, lista &lst) {
+>   nodo *nuevo = new nodo;
+>   nuevo->dato = i;
+>   if (es_vacia_lista(lst)) {
+>     lst->inicio = lst->final = nuevo;
+>     nuevo->anterior = nuevo->siguiente = NULL;
+>   } else {
+>     nuevo->anterior = loc;
+>     nuevo->siguiente = loc->siguiente;
+>     loc->siguiente = nuevo;
+> 
+>     if (loc == lst->final)
+>       lst->final = nuevo;
+>     else
+>       nuevo->siguiente->anterior = nuevo;
+>   }
+> }
+> 
+260d257
+< 
+279d275
+< 
+315,317c311,327
+< info_t info_lista(const localizador loc, const lista lst) {
+<   info_t res = loc->dato;
+< 
+---
+> localizador anterior_clave(const int clave, const localizador loc,
+>                            const lista lst) {
+>   localizador res;
+>   if (es_vacia_lista(lst)){
+>     res = NULL;
+>   }
+>   else {
+>     res = loc;
+>     bool encontrado = false;
+>     while ((!encontrado) && (res != NULL)) {
+>       if (numero_info(res->dato) == clave) {
+>         encontrado = true;
+>       }
+>       else
+>         res = res->anterior;
+>     }
+>   }
+319,328d328
+< } 
+< 
+< void cambiar_en_lista(const info_t i, const localizador loc, lista &lst) {
+<   loc->dato = i;
+< }
+< 
+< void intercambiar(const localizador loc1, const localizador loc2, lista &lst) {
+<   info_t aux = loc1->dato;
+<   loc1->dato = loc2->dato;
+<   loc2->dato = aux;

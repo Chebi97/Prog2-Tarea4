@@ -90,7 +90,7 @@ info_t remover_mayor(binario &b) {
 
 static binario cons(info_t i, binario izq, binario der) {
   binario res = crear_binario();
-  res->dato = i;
+  res->dato = copiar_info(i);
   res->izq = izq;
   res->der = der;
   return res;
@@ -102,7 +102,7 @@ binario crear_filtrado(const int clave, comp_t criterio, const binario b) {
   binario fder, fizq;
   info_t imayor, raiz;
 
-  if (!es_vacio_binario(b)) {
+  if (b!=NULL && !es_vacio_binario(b)) {
     fizq = crear_filtrado(clave, criterio, b->izq);
     fder = crear_filtrado(clave, criterio, b->der);
     raiz = b->dato;
@@ -110,11 +110,11 @@ binario crear_filtrado(const int clave, comp_t criterio, const binario b) {
       case menor: {
         if (numero_info(raiz) < clave) {
           res = cons(raiz, fizq, fder);
-        } else if (es_vacio_binario(fizq)) {
+        } else if (fizq == NULL || es_vacio_binario(fizq)) {
           liberar_binario(fizq);
           fizq = NULL;
           res = fder;
-        } else if (es_vacio_binario(fder)) {
+        } else if (fder == NULL ||es_vacio_binario(fder)) {
           liberar_binario(fder);
           fder = NULL;
           res = fizq;
@@ -127,11 +127,11 @@ binario crear_filtrado(const int clave, comp_t criterio, const binario b) {
       case mayor: {
         if (numero_info(raiz) > clave) {
           res = cons(raiz, fizq, fder);
-        } else if (es_vacio_binario(fizq)) {
+        } else if (fizq == NULL || es_vacio_binario(fizq)) {
           liberar_binario(fizq);
           fizq = NULL;
           res = fder;
-        } else if (es_vacio_binario(fder)) {
+        } else if (fder == NULL || es_vacio_binario(fder)) {
           liberar_binario(fder);
           fder = NULL;
           res = fizq;
@@ -144,11 +144,11 @@ binario crear_filtrado(const int clave, comp_t criterio, const binario b) {
       case igual: {
         if (numero_info(raiz) == clave) {
           res = cons(raiz, fizq, fder);
-        } else if (es_vacio_binario(fizq)) {
+        } else if (fizq == NULL || es_vacio_binario(fizq)) {
           liberar_binario(fizq);
           fizq = NULL;
           res = fder;
-        } else if (es_vacio_binario(fder)) {
+        } else if (fder == NULL ||es_vacio_binario(fder)) {
           liberar_binario(fder);
           fder = NULL;
           res = fizq;
@@ -160,7 +160,11 @@ binario crear_filtrado(const int clave, comp_t criterio, const binario b) {
       }
     }
   } else {
-    res = crear_binario();
+    if (b != NULL){
+      res = crear_binario();
+    } else {
+      res = NULL;
+    }
   }
     return res;
 }
@@ -174,25 +178,6 @@ void remover_de_binario(const texto_t t, binario &b) {
   if (b != NULL && !es_vacio_binario(b)) {
     comp_t comparacion = comparar_texto(texto_info(b->dato), t);
     switch (comparacion) {
-     /* case igual: {
-        if (b->der == NULL && b->izq == NULL) {
-          liberar_info(b->dato);
-        } else if (b->der == NULL) {
-          binario izq = b->izq;
-          liberar_info(b->dato);
-          delete (b);
-          b = izq;
-        } else if (b->izq == NULL) {
-          binario der = b->der;
-          liberar_info(b->dato);
-          delete (b);
-          b = der;
-        } else {
-          liberar_info(b->dato);
-          b->dato = remover_mayor(b->izq);
-        }
-        break;
-      } */
     case igual: {
             if (b->der == NULL && b->izq == NULL){
               liberar_info(b->dato);
@@ -259,7 +244,7 @@ binario derecho(const binario b) {
 
 binario buscar_subarbol(const texto_t t, const binario b) {
   binario res = NULL;
-  if (!es_vacio_binario(b)) {
+  if (b!=NULL && !es_vacio_binario(b)) {
     comp_t comparacion = comparar_texto(texto_info(b->dato), t);
     switch (comparacion) {
       case igual: {
@@ -267,11 +252,11 @@ binario buscar_subarbol(const texto_t t, const binario b) {
         break;
       }
       case mayor: {
-        buscar_subarbol(t, b->izq);
+        res = buscar_subarbol(t, b->izq);
         break;
       }
       case menor: {
-        buscar_subarbol(t, b->der);
+        res = buscar_subarbol(t, b->der);
         break;
       }
     }
@@ -297,7 +282,7 @@ nat cantidad_binario(const binario b) {
 
 nat cantidad_de_caminos(const lista l, const binario b) {
   nat res = 0;
-  if (!es_vacia_lista(l) && !es_vacio_binario(b)) {
+  if (!es_vacia_lista(l) && b!= NULL  && !es_vacio_binario(b)) {
     if (numero_info(info_lista(inicio_lista(l), l)) == numero_info(b->dato)) {
       if (siguiente(inicio_lista(l), l) != NULL) {
         lista lTail = segmento_lista(siguiente(inicio_lista(l), l), final_lista(l), l);
@@ -350,12 +335,12 @@ texto_t camino_a_texto(const camino_t c) {
   return res;
 }
 
-static camino_t buscar_camino_aux(const lista l, const binario b, camino_t c) {
-  if (!es_vacia_lista(l) && !es_vacio_binario(b)) {
-    if (texto_info(info_lista(inicio_lista(l), l)) == texto_info(b->dato)) {
+static camino_t buscar_camino_aux(const lista l, const binario b, camino_t &c) {
+  if (!es_vacia_lista(l) && b!=NULL && !es_vacio_binario(b)) {
+    if ( comparar_texto(texto_info(info_lista(inicio_lista(l), l)), texto_info(b->dato)) == igual) {
       if (siguiente(inicio_lista(l), l) != NULL) {
         lista lTail = segmento_lista(siguiente(inicio_lista(l), l), final_lista(l), l);
-        if (texto_info(info_lista(inicio_lista(lTail),l)) > texto_info(b->dato)) {
+        if (comparar_texto(texto_info(info_lista(inicio_lista(lTail), lTail)), texto_info(b->dato)) == mayor) {
           c.ramas[c.cantidad_ramas] = der;
           c.cantidad_ramas++;
           buscar_camino_aux(lTail, b->der, c);
@@ -381,12 +366,10 @@ camino_t buscar_camino(const lista l, const binario b) {
   res.cantidad_ramas = 0;
   res.ramas = new rama_t[longitud(l) - 1];
 
-  if (!es_vacia_lista(l) && !es_vacio_binario(b)) {
+  if (!es_vacia_lista(l) && b!=NULL && !es_vacio_binario(b)) {
     res = buscar_camino_aux(l, b, res);
   }
-  if (res.existe == false) {
-    delete[] res.ramas;
-  }
+
   return res;
 }
 
