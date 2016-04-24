@@ -18,26 +18,16 @@ struct rep_binario {
 };
 
 binario crear_binario() {
-
-  binario res = new rep_binario;
-
-  res->dato = NULL;
-  res->izq = NULL;
-  res->der = NULL;
-
+  binario res = NULL;
   return res;
-
 }
 
 bool insertar_en_binario(const info_t i, binario &b) {
 
   bool res = false;
 
-  if (b == NULL) {
-    b = crear_binario();
-    b->dato = i;
-    res = true;
-  } else if (es_vacio_binario(b)){
+  if (es_vacio_binario(b)){
+    b = new rep_binario;
     b->dato = i;
     b->izq = b->der = NULL;
     res = true;
@@ -49,8 +39,8 @@ bool insertar_en_binario(const info_t i, binario &b) {
         res = false;
       break;
     } case mayor: {
-        if (b->der == NULL) {
-          binario insertado = crear_binario();
+        if (es_vacio_binario(b->der)) {
+          binario insertado = new rep_binario;
           insertado->dato = i;
           b->der = insertado;
           res = true;
@@ -59,8 +49,8 @@ bool insertar_en_binario(const info_t i, binario &b) {
       }
       break;
     } case menor:{
-        if (b->izq == NULL) {
-          binario insertado = crear_binario();
+        if (es_vacio_binario(b->izq)) {
+          binario insertado = new rep_binario;
           insertado->dato = i;
           b->izq = insertado;
           res = true;
@@ -89,8 +79,8 @@ info_t remover_mayor(binario &b) {
 }
 
 static binario cons(info_t i, binario izq, binario der) {
-  binario res = crear_binario();
-  res->dato = i;
+  binario res = new rep_binario;
+  res->dato = copiar_info(i);
   res->izq = izq;
   res->der = der;
   return res;
@@ -111,12 +101,8 @@ binario crear_filtrado(const int clave, comp_t criterio, const binario b) {
         if (numero_info(raiz) < clave) {
           res = cons(raiz, fizq, fder);
         } else if (es_vacio_binario(fizq)) {
-          liberar_binario(fizq);
-          fizq = NULL;
           res = fder;
         } else if (es_vacio_binario(fder)) {
-          liberar_binario(fder);
-          fder = NULL;
           res = fizq;
         } else {
           imayor = remover_mayor(fizq);
@@ -128,12 +114,8 @@ binario crear_filtrado(const int clave, comp_t criterio, const binario b) {
         if (numero_info(raiz) > clave) {
           res = cons(raiz, fizq, fder);
         } else if (es_vacio_binario(fizq)) {
-          liberar_binario(fizq);
-          fizq = NULL;
           res = fder;
         } else if (es_vacio_binario(fder)) {
-          liberar_binario(fder);
-          fder = NULL;
           res = fizq;
         } else {
           imayor = remover_mayor(fizq);
@@ -145,12 +127,8 @@ binario crear_filtrado(const int clave, comp_t criterio, const binario b) {
         if (numero_info(raiz) == clave) {
           res = cons(raiz, fizq, fder);
         } else if (es_vacio_binario(fizq)) {
-          liberar_binario(fizq);
-          fizq = NULL;
           res = fder;
         } else if (es_vacio_binario(fder)) {
-          liberar_binario(fder);
-          fder = NULL;
           res = fizq;
         } else {
           imayor = remover_mayor(fizq);
@@ -160,70 +138,47 @@ binario crear_filtrado(const int clave, comp_t criterio, const binario b) {
       }
     }
   } else {
-    res = crear_binario();
+    res = NULL;
   }
     return res;
 }
 
 bool es_vacio_binario(const binario b) {
-  bool res = b->dato == NULL;
+  bool res = b == NULL;
   return res;
 }
 
 void remover_de_binario(const texto_t t, binario &b) {
-  if (b != NULL && !es_vacio_binario(b)) {
+  if (!es_vacio_binario(b)) {
     comp_t comparacion = comparar_texto(texto_info(b->dato), t);
     switch (comparacion) {
-     /* case igual: {
-        if (b->der == NULL && b->izq == NULL) {
+      case igual: {
+        if (es_vacio_binario(b->der) && es_vacio_binario(b->izq)) {
           liberar_info(b->dato);
-        } else if (b->der == NULL) {
-          binario izq = b->izq;
-          liberar_info(b->dato);
-          delete (b);
-          b = izq;
-        } else if (b->izq == NULL) {
-          binario der = b->der;
-          liberar_info(b->dato);
-          delete (b);
-          b = der;
+          delete b;
+          b = crear_binario();
+        } else if (es_vacio_binario(b->der)) {
+          binario temp = b;
+          b = b->izq;
+          liberar_info(temp->dato);
+          delete temp;
+        } else if (es_vacio_binario(b->izq)) {
+          binario temp = b;
+          b = b->der;
+          liberar_info(temp->dato);
+          delete temp;
         } else {
-          liberar_info(b->dato);
+          info_t temp = b->dato;
           b->dato = remover_mayor(b->izq);
+          liberar_info(temp);
         }
-        break;
-      } */
-    case igual: {
-            if (b->der == NULL && b->izq == NULL){
-              liberar_info(b->dato);
-              delete b;
-              b = crear_binario();
-            } else {
-              if (b->der == NULL){
-                binario temp = b;
-                b = b->izq;
-                liberar_info(temp->dato);
-                delete temp;
-              } else {
-                 if (b->izq == NULL){
-                   binario temp = b;
-                   b = b->der;
-                   liberar_info(temp->dato);
-                   delete temp;
-                 } else {
-                    info_t temp = b->dato;
-                    b->dato = remover_mayor(b->izq);
-                    liberar_info(temp);
-                 }
-              }
-            }
         break;
       }
       case mayor: {
         remover_de_binario(t, b->izq);
         break;
       }
-      case menor:{
+      case menor: {
         remover_de_binario(t, b->der);
         break;
       }
@@ -231,14 +186,11 @@ void remover_de_binario(const texto_t t, binario &b) {
   }
 }
 
+
 void liberar_binario(binario &b) {
-  if (b != NULL && !es_vacio_binario(b)) {
-    info_t aux = remover_mayor(b);
-    liberar_info(aux);
+  if (!es_vacio_binario(b)) {
+    remover_de_binario(texto_info(b->dato), b);
     liberar_binario(b);
-  }
-  if (b != NULL) {
-    delete b;
   }
 }
 
@@ -258,7 +210,7 @@ binario derecho(const binario b) {
 }
 
 binario buscar_subarbol(const texto_t t, const binario b) {
-  binario res = NULL;
+  binario res = crear_binario();
   if (!es_vacio_binario(b)) {
     comp_t comparacion = comparar_texto(texto_info(b->dato), t);
     switch (comparacion) {
@@ -267,11 +219,11 @@ binario buscar_subarbol(const texto_t t, const binario b) {
         break;
       }
       case mayor: {
-        buscar_subarbol(t, b->izq);
+        res = buscar_subarbol(t, b->izq);
         break;
       }
       case menor: {
-        buscar_subarbol(t, b->der);
+        res = buscar_subarbol(t, b->der);
         break;
       }
     }
@@ -281,7 +233,7 @@ binario buscar_subarbol(const texto_t t, const binario b) {
 
 nat altura_binario(const binario b) {
   nat res = 0;
-  if (b != NULL && !es_vacio_binario(b)) {
+  if (!es_vacio_binario(b)) {
     res = 1 + std::max(altura_binario(b->der), altura_binario(b->izq));
   }
   return res;
@@ -289,7 +241,7 @@ nat altura_binario(const binario b) {
 
 nat cantidad_binario(const binario b) {
   nat res = 0;
-  if (b != NULL && !es_vacio_binario(b)) {
+  if (!es_vacio_binario(b)) {
     res = 1 + cantidad_binario(b->der) + cantidad_binario(b->izq);
   }
   return res;
@@ -304,7 +256,7 @@ nat cantidad_de_caminos(const lista l, const binario b) {
         res = cantidad_de_caminos(lTail, b->der) + cantidad_de_caminos(lTail, b->izq);
         liberar_lista(lTail);
       } else {
-        if (b->der == NULL && b->izq == NULL) {
+        if (es_vacio_binario(b->der) && es_vacio_binario(b->izq)) {
           res = 1;
         }
       }
@@ -350,12 +302,12 @@ texto_t camino_a_texto(const camino_t c) {
   return res;
 }
 
-static camino_t buscar_camino_aux(const lista l, const binario b, camino_t c) {
+static camino_t buscar_camino_aux(const lista l, const binario b, camino_t &c) {
   if (!es_vacia_lista(l) && !es_vacio_binario(b)) {
-    if (texto_info(info_lista(inicio_lista(l), l)) == texto_info(b->dato)) {
+    if ( comparar_texto(texto_info(info_lista(inicio_lista(l), l)), texto_info(b->dato)) == igual) {
       if (siguiente(inicio_lista(l), l) != NULL) {
         lista lTail = segmento_lista(siguiente(inicio_lista(l), l), final_lista(l), l);
-        if (texto_info(info_lista(inicio_lista(lTail),l)) > texto_info(b->dato)) {
+        if (comparar_texto(texto_info(info_lista(inicio_lista(lTail), lTail)), texto_info(b->dato)) == mayor) {
           c.ramas[c.cantidad_ramas] = der;
           c.cantidad_ramas++;
           buscar_camino_aux(lTail, b->der, c);
@@ -366,7 +318,7 @@ static camino_t buscar_camino_aux(const lista l, const binario b, camino_t c) {
         }
         liberar_lista(lTail);
       } else {
-        if (b->der == NULL && b->izq == NULL) {
+        if (es_vacio_binario(b->der) && es_vacio_binario(b->izq)) {
           c.existe = true;
         }
       }
@@ -384,9 +336,7 @@ camino_t buscar_camino(const lista l, const binario b) {
   if (!es_vacia_lista(l) && !es_vacio_binario(b)) {
     res = buscar_camino_aux(l, b, res);
   }
-  if (res.existe == false) {
-    delete[] res.ramas;
-  }
+
   return res;
 }
 
@@ -404,7 +354,7 @@ static void imprimir_binario_aux(const binario b, nat a) {
         printf("\n");
         a++;
         imprimir_binario_aux(b->izq, a);
-        a--;
+        a--;                               //puede no ser necesario
       } else if (b->izq == NULL) {
         a++;
         imprimir_binario_aux(b->der, a);
@@ -423,13 +373,11 @@ static void imprimir_binario_aux(const binario b, nat a) {
         printf("\n");
         a++;
         imprimir_binario_aux(b->izq, a);
-        a--;
+        a--;                                 //puede no ser necesario
       }
     }
 }
 
 void imprimir_binario(const binario b) {
-  if (b != NULL) {
-    imprimir_binario_aux(b, 0);
-  }
+  imprimir_binario_aux(b, 0);
 }

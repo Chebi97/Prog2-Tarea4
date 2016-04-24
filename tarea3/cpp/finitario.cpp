@@ -5,6 +5,7 @@
 #include "../include/finitario.h"
 
 #include <stdlib.h>
+#include <algorithm>
 
 struct rep_finitario {
   info_t dato;
@@ -13,65 +14,73 @@ struct rep_finitario {
 };
 
 finitario crear_finitario() {
-	finitario res = new rep_finitario;
-	res->primer_hijo = NULL;
-	res->sig_hermano = NULL;
+	finitario res = NULL;
+	return res;
+}
 
+/* Recibe un arbol vacio y lo inicializa con un nodo i
+ * sus ramas son NULL
+*/
+static void inicializar_finitario(const info_t i, finitario &f) {
+  f = new rep_finitario;
+  f->dato = i;
+  f->primer_hijo = NULL;
+  f->sig_hermano = NULL;
 }
 
 void insertar_en_finitario(const info_t i, const nat k, finitario &f) {
 
-	finitario buscador = f->primer_hijo;
-	nat j = 1; //asumo que la altura base es 1
-
-	if (es_vacio_finitario(buscador)){
-		buscador->dato = i;
-		buscador->primer_hijo = NULL;
-		buscador->sig_hermano = NULL;
-	} else {
-		while (buscador->sig_hermano != NULL || !(j == k)){
-			buscador = buscador->sig_hermano;
-			j++;
-		}
-		buscador->dato = i;
-	}
+  if (!es_vacio_finitario(f)) {
+    if (es_vacio_finitario(f->primer_hijo)) {
+      inicializar_finitario(i, f->primer_hijo);
+    } else {
+      if (k == 1) {
+        finitario aux = f->primer_hijo;
+        f->primer_hijo = crear_finitario();
+        inicializar_finitario(i, f->primer_hijo);
+        f->sig_hermano = aux;
+      } else {
+        finitario buscador = f->primer_hijo;
+        nat j = k;
+        while (!es_vacio_finitario(buscador->sig_hermano) && 2 < j) {
+          j--;
+          buscador = buscador->sig_hermano;
+        }
+        finitario aux = buscador->sig_hermano;
+        buscador->sig_hermano = crear_finitario();
+        inicializar_finitario(i, buscador->sig_hermano);
+        buscador->sig_hermano->sig_hermano = aux;
+      }
+    }
+  } else {
+    inicializar_finitario(i, f);
+  }
 }
 		 
 
 
 
 void liberar_finitario(finitario &f) {
-
-	finitario buscador = f;
-
-	if (buscador->sig_hermano != NULL){
-		buscador = buscador->sig_hermano;
-		liberar_finitario(buscador);
-			if (buscador->primer_hijo != NULL){
-			buscador = buscador->primer_hijo;
-			liberar_finitario(buscador);
-	} else {
-		if (buscador->primer_hijo != NULL){
-			buscador = buscador->primer_hijo;
-			liberar_finitario(buscador);
-		} else {
-			liberar_info(buscador->dato);
-			delete buscador;
-		}
-	}
-
+  if (!es_vacio_finitario(f)) {
+    if (!es_vacio_finitario(f->sig_hermano)) {
+      liberar_finitario(f->sig_hermano);
+    }
+    if (!es_vacio_finitario(f->primer_hijo)) {
+      liberar_finitario(f->primer_hijo);
+    }
+    liberar_info(f->dato);
+    delete f;
+  }
 }
 
 bool es_vacio_finitario(const finitario f) {
-
-	bool res = finitario == NULL;
+	bool res = f == NULL;
 	return res;
 }
 
 info_t raiz_finitario(const finitario f) {
-
 //asumo que comparte memoria
-	info_t res = b->dato;
+	info_t res = f->dato;
 	return res;
 
 }
@@ -79,83 +88,49 @@ info_t raiz_finitario(const finitario f) {
 finitario hijo(const nat k, const finitario f) {
 
 //asumo que comparte memoria
+  nat j = k;
+  finitario res;
+  finitario buscador = f;
+  if (es_vacio_finitario(f->primer_hijo)) {
+    buscador = f->primer_hijo;
+    while (!es_vacio_finitario(buscador->sig_hermano) && 1 < j) {
+      j--;
+      buscador = buscador->sig_hermano;
+    }
+    res = buscador;
+  } else {
+    res = NULL;
+  }
+  return res;
+}
 
-	finitario res = f;
-	nat i = 1; //asumo que la altura base es uno
-
-	while ((res != NULL) || i =< k );{
-			res = res->primer_hijo;
-			i++;
-	}
-	if (i != k){
-		res = NULL;
-	}
-	return res;
-
-
+static void nivel_aux(nat k, const finitario f, lista &l) {
+  nat j = k; //asumo que el primer nivel es 1
+  if (!es_vacio_finitario(f)) {
+    if (j == 1) {
+      insertar_despues(copiar_info(f->dato), final_lista(l), l);
+      nivel_aux(j, f->sig_hermano, l);
+    } else {
+      nivel_aux(--j, f->primer_hijo, l);
+      nivel_aux(j, f->sig_hermano, l);
+    }
+  }
 }
 
 lista nivel(nat k, const finitario f) {
-	lista res = crear_lista();
-	lista memoriacolgada; /*al hacerlo de manera recursiva y armar res al principio,
-							muchas veces se itera de manera recursiva pero res queda vacio.
-							Para solucionarlo, lo guardamos aca, y lo borramos cada vez que salimos*/
-	finitario buscador  = f;
-	nat j = k; //asumo que el primer nivel es 1
-
-	if (buscador->sig_hermano != NULL){
-		buscador = buscador->sig_hermano;
-		memoriacolgada  = nivel(j, buscador);
-		liberar_lista(memoriacolgada);
-		if (buscador->primer_hijo != NULL){
-			j--;
-			buscador = buscador->primer_hijo;
-			memoriacolgada = nivel(j, buscador);
-			liberar_lista(memoriacolgada);
-		}
-	} else {
-		if (buscador->primer_hijo != NULL || j == 0){ /*hago que j vaya yendo a cero cada vez que bajo, como no tengo una manera de
-														moverme por el nivel de un finitario, agrego el j como stop de bajar*/
-			j--;
-			buscador = buscador->primer_hijo;
-			memoriacolgada = nivel(j, buscador);
-			liberar_lista(memoriacolgada);
-		} else {
-			insertar_antes(buscador->dato, final_lista(res), res);
-			ordenar(res);
-		}
-	}
-return res;
+  lista res = crear_lista();
+  if (altura_finitario(f) >= k) {
+    nivel_aux(k, f, res);
+    ordenar(res);
+  }
+  return res;
 
 }
 
 nat altura_finitario(const finitario f) {
-
-	nat k, res;
-	k = res = 0;
-	nat res = altura_finitario_aux(k, res, finitario f);
-	return res;
-
-}
-nat altura_finitario_aux(nat &k, nat &res, const finitario f) {
-
-	if (buscador->sig_hermano != NULL){
-		buscador = buscador->sig_hermano;
-		altura_finitario_aux(k, res, buscador);
-		if (buscador->primer_hijo != NULL){
-			buscador = buscador->primer_hijo;
-			res = std::max(++k, res);
-			altura_finitario_aux(k, res, buscador);
-		}
-	} else {
-		if (buscador->primer_hijo != NULL){
-			buscador = buscador->primer_hijo;
-			res = std::max(++k, res);
-			altura_finitario_aux(k, res, buscador);
-
-		} else {
-			res = std::max(++k, res);
-			altura_finitario_aux(k, res, buscador);
-		}
-	}
+  nat res = 0;
+  if (!es_vacio_finitario(f)) {
+    res = std::max((altura_finitario(f->primer_hijo)+1), altura_finitario(f->sig_hermano));
+  }
+  return res;
 }
