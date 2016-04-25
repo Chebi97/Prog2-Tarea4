@@ -21,24 +21,23 @@ finitario crear_finitario() {
 /* Recibe un arbol vacio y lo inicializa con un nodo i
  * sus ramas son NULL
 */
-static void inicializar_finitario(const info_t i, finitario &f) {
+static void cons_finitario(const info_t i, finitario &f, finitario hijo, finitario hermano) {
   f = new rep_finitario;
   f->dato = i;
-  f->primer_hijo = NULL;
-  f->sig_hermano = NULL;
+  f->primer_hijo = hijo;
+  f->sig_hermano = hermano;
 }
 
 void insertar_en_finitario(const info_t i, const nat k, finitario &f) {
 
   if (!es_vacio_finitario(f)) {
     if (es_vacio_finitario(f->primer_hijo)) {
-      inicializar_finitario(i, f->primer_hijo);
+      cons_finitario(i, f->primer_hijo, crear_finitario(), crear_finitario());
     } else {
       if (k == 1) {
         finitario aux = f->primer_hijo;
         f->primer_hijo = crear_finitario();
-        inicializar_finitario(i, f->primer_hijo);
-        f->sig_hermano = aux;
+        cons_finitario(i, f->primer_hijo, crear_finitario(), aux);
       } else {
         finitario buscador = f->primer_hijo;
         nat j = k;
@@ -48,18 +47,15 @@ void insertar_en_finitario(const info_t i, const nat k, finitario &f) {
         }
         finitario aux = buscador->sig_hermano;
         buscador->sig_hermano = crear_finitario();
-        inicializar_finitario(i, buscador->sig_hermano);
+        cons_finitario(i, buscador->sig_hermano, crear_finitario(), aux);
         buscador->sig_hermano->sig_hermano = aux;
       }
     }
   } else {
-    inicializar_finitario(i, f);
+    cons_finitario(i, f, crear_finitario(), crear_finitario());
   }
 }
 		 
-
-
-
 void liberar_finitario(finitario &f) {
   if (!es_vacio_finitario(f)) {
     if (!es_vacio_finitario(f->sig_hermano)) {
@@ -82,18 +78,16 @@ info_t raiz_finitario(const finitario f) {
 //asumo que comparte memoria
 	info_t res = f->dato;
 	return res;
-
 }
 
 finitario hijo(const nat k, const finitario f) {
-
 //asumo que comparte memoria
   nat j = k;
   finitario res;
   finitario buscador = f;
-  if (es_vacio_finitario(f->primer_hijo)) {
+  if (!es_vacio_finitario(f->primer_hijo)) {
     buscador = f->primer_hijo;
-    while (!es_vacio_finitario(buscador->sig_hermano) && 1 < j) {
+    while (!es_vacio_finitario(buscador) && j > 1) {
       j--;
       buscador = buscador->sig_hermano;
     }
@@ -112,6 +106,7 @@ static void nivel_aux(nat k, const finitario f, lista &l) {
       nivel_aux(j, f->sig_hermano, l);
     } else {
       nivel_aux(--j, f->primer_hijo, l);
+      j = k;
       nivel_aux(j, f->sig_hermano, l);
     }
   }

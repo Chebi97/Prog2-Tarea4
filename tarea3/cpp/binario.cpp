@@ -22,43 +22,47 @@ binario crear_binario() {
   return res;
 }
 
+static binario cons(info_t i, binario izq, binario der) {
+  binario res = new rep_binario;
+  res->dato = copiar_info(i);
+  res->izq = izq;
+  res->der = der;
+  return res;
+}
+
 bool insertar_en_binario(const info_t i, binario &b) {
 
   bool res = false;
 
   if (es_vacio_binario(b)){
-    b = new rep_binario;
-    b->dato = i;
-    b->izq = b->der = NULL;
+    b = cons(i, crear_binario(), crear_binario());
     res = true;
     return res;
   } else {
     comp_t comparacion = comparar_texto(texto_info(i), texto_info(b->dato));
     switch (comparacion) {
-      case igual: {
-        res = false;
-      break;
-    } case mayor: {
-        if (es_vacio_binario(b->der)) {
-          binario insertado = new rep_binario;
-          insertado->dato = i;
-          b->der = insertado;
-          res = true;
-        } else {
-         res = insertar_en_binario(i, b->der);
-      }
-      break;
-    } case menor:{
-        if (es_vacio_binario(b->izq)) {
-          binario insertado = new rep_binario;
-          insertado->dato = i;
-          b->izq = insertado;
-          res = true;
-        } else {
-         res = insertar_en_binario(i, b->izq);
+        case igual: {
+          res = false;
+        break;
+      } case mayor: {
+          if (es_vacio_binario(b->der)) {
+            binario insertado = cons(i, crear_binario(), crear_binario());
+            b->der = insertado;
+            res = true;
+          } else {
+           res = insertar_en_binario(i, b->der);
         }
-      break;
-      }
+        break;
+      } case menor:{
+          if (es_vacio_binario(b->izq)) {
+            binario insertado = cons(i, crear_binario(), crear_binario());
+            b->izq = insertado;
+            res = true;
+          } else {
+           res = insertar_en_binario(i, b->izq);
+          }
+        break;
+        }
     }
   }
   return res;
@@ -75,14 +79,6 @@ info_t remover_mayor(binario &b) {
   } else {
     res = remover_mayor(b->der);
   }
-  return res;
-}
-
-static binario cons(info_t i, binario izq, binario der) {
-  binario res = new rep_binario;
-  res->dato = copiar_info(i);
-  res->izq = izq;
-  res->der = der;
   return res;
 }
 
@@ -342,7 +338,7 @@ camino_t buscar_camino(const lista l, const binario b) {
 
 static void imprimir_binario_aux(const binario b, nat a) {
   if (!es_vacio_binario(b)) {
-      if (b->izq == NULL && b->der == NULL) {
+      if (es_vacio_binario(b->izq) && es_vacio_binario(b->der)) {
         for (nat i = 0; i < a; i++)
           printf("%s", "-");
         escribir_texto(info_a_texto(b->dato));
