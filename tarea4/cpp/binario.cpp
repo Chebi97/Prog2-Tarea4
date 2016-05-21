@@ -17,6 +17,35 @@ struct rep_binario {
   rep_binario *der;
 };
 
+//auxiliar para kesimo
+void pasar_binario_alista(const binario b, lista &l){
+  
+  if (b!=NULL && !es_vacio_binario(b)){
+    pasar_binario_alista(izquierdo(b), l);
+    insertar_despues(raiz_binario(b), final_lista(l), l);
+    pasar_binario_alista(derecho(b), l);
+  }
+
+}
+lista linealizacion(const binario b){
+    lista res = crear_lista();
+    pasar_binario_alista(b, res); //revisar orden
+    return res;
+}
+binario kesimo_subarbol(const nat k, const binario b) {
+//asumo que comparte memoria
+  lista listabinario = crear_lista();
+  pasar_binario_alista(b, listabinario);
+  localizador kesima_raiz = inicio_lista(listabinario);
+  for(nat j=1; j< k; j++){ 
+      kesima_raiz = siguiente(kesima_raiz, listabinario);
+  }
+  binario res = buscar_subarbol(texto_info(info_lista(kesima_raiz, listabinario)), b);
+  return res;
+
+}
+
+
 binario crear_binario() {
   binario res = NULL;
   return res;
