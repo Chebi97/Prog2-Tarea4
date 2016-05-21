@@ -42,10 +42,13 @@ void apilar(const texto_t t, pila &p){
   Si es_vacia_pila(p) no hace nada.
  */
 void desapilar(pila &p){
-    node* aux = p->tope;
+  if (!es_vacia_pila(p)){
+    nodep* aux = p->tope;
     delete p->tope;
     p->tope->siguiente = aux;
+  }
 }
+
 
 /*
   Devuelve `true` si `p` es vacía (no tiene elementos), o `false` en otro caso.
