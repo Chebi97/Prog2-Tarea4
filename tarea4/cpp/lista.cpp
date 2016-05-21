@@ -24,6 +24,14 @@ struct rep_lista {
   nodo *inicio;
   nodo *final;
 };
+void imprimir_lista(const lista lst) {
+  localizador cursor = inicio_lista(lst);
+  while (cursor != NULL) {
+    escribir_texto(info_a_texto(info_lista(cursor, lst)));
+    cursor = siguiente(cursor, lst);
+  }
+  printf("\n");
+}
 
 lista crear_lista() {
   // se obtiene espacio para la cabecera
