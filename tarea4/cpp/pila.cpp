@@ -32,7 +32,7 @@ void apilar(const texto_t t, pila &p){
         res->texto = t;
         res->siguiente = p->tope;
         p->tope = res;
-        p->altura = p->altura +1;
+        p->altura++;
     }
 }
 
