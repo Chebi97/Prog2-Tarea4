@@ -17,7 +17,35 @@ struct rep_binario {
   rep_binario *der;
 };
 
-//auxiliar para kesimo
+static void crear_balanceado_aux(const lst, localizador &loc, binario &b){
+  if (!es_vacia_lista(lst)){
+    nat alturader = altura_binario(b->der);
+    nat alturaizq = altura_binario(b->izq);
+    if (alturaizq == alturader)){
+      insertar_en_binario(info_lista(loc, lst), b)
+    } else {
+      if (alturaizq == alturader+1){
+        insertar_en_binario(info_lista(loc, lst), b->izq);
+      }
+      if (1 + alturaizq == alturader){
+        insertar_en_binario(info_lista(loc, lst), b->der);
+      }
+    }
+    loc = siguiente(loc, lst);
+    crear_balanceado_aux(lst, loc, b);
+  }
+}
+
+
+binario crear_balanceado(const lista lst){
+  localizador loc = inicio_lista;
+  binario res = crear_binario();
+  crear_balanceado_aux(lst, loc, res);
+  return res;
+}
+
+
+//auxiliar para kesimo y linealizacion
 void pasar_binario_alista(const binario b, lista &l){
   
   if (b!=NULL && !es_vacio_binario(b)){
