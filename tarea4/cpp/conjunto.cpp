@@ -67,34 +67,37 @@ void excluir(const texto_t t, conjunto &c){
   remover_de_binario(t, c->arbol);
 }
 
-/*
-  Devuelve un conjunto con los elementos cuyos datos de texto pertenecen a `c1`
-  y `c2`. El  dato numérico en el conjunto devuelto debe ser el del elemento
-  de `c1`-
-  El conjunto devuelto no comparte memoria ni con `c1` no con `c2`.
-  El tiempo de ejecucion es O(n1 + n2 + n.log n), siendo `n1` y
-  `n2` la cantidad de elementos de `c1` y `c2` respectivamente y `n` la del
-  conjunto resultado.
-  Mientras en el conjunto devuelto no se hagan inserciones ni remociones las
-  siguientes llamadas a `pertenece` deben ejecutarse en tiempo O(log n).
- */
-
-static void interseccion_aux(binario b, conjunto c, conjunto &res){
-  bool ains = false;
-  if (!es_vacio_binario(b)){
-    ains = pertenece(texto_info(raiz_binario(b)), c);
-    if (ains) {
-      insertar_en_binario (raiz_binario(b), res->arbol);
-    }
-    interseccion_aux(izquierdo(b), c, res);
-    interseccion_aux(derecho(b), c, res);
-  }
-}
-
 conjunto interseccion(const conjunto c1, const conjunto c2){
   conjunto res =  crear_conjunto();
-  interseccion_aux(c1->arbol, c2, res);
-  return res;
+  lista l1 = linealizacion(c1->arbol);
+  lista l2 = linealizacion(c2->arbol);
+  lista aux = crear_lista();
+  localizador loc1 = inicio_lista(l1);
+  localizador loc2 = inicio_lista(l2);
+  while (es_localizador_lista(loc1) && es_localizador_lista(loc2)){
+    comp_t comparacion = comparar_texto(texto_info(info_lista(loc1, l1)), texto_info(info_lista(loc2, l2)));
+     switch (comparacion) {
+      case igual: {
+        insertar_despues(info_lista(loc1, l1), final_lista(aux), aux);
+        loc2 = siguiente(loc2, l2);
+        loc1 = siguiente(loc1, l1);
+        break;
+      }
+      case mayor: {
+        loc2 = siguiente(loc2, l2);
+        break;
+      }
+      case menor: {
+        loc1 = siguiente(loc1, l1);
+        break;
+      }
+    }
+  }
+  c->arbol = crear_balanceado(aux);
+  liberar_lista(l1);
+  liberar_lista(l2);
+  liberar_lista(aux);
+  return c;
 }
 
 /*
@@ -108,22 +111,44 @@ conjunto interseccion(const conjunto c1, const conjunto c2){
   siguientes llamadas a `pertenece` deben ejecutarse en tiempo O(log n).
  */
 
-static void diferencia_aux(binario b, conjunto c, conjunto &res){
-   bool ains = false;
-   if (!es_vacio_binario(b)){
-     ains = pertenece(texto_info(raiz_binario(b)), c);
-     if (!ains) {
-       insertar_en_binario (raiz_binario(b), res->arbol);
-     }
-     diferencia_aux(izquierdo(b), c, res);
-     diferencia_aux(derecho(b), c, res);
-   }
- }
 conjunto diferencia(const conjunto c1, const conjunto c2){
-  conjunto res = crear_conjunto();
-  diferencia_aux(c1->arbol, c2, res);
-  diferencia_aux(c2->arbol, c1, res);
-  return res;
+  conjunto res =  crear_conjunto();
+  lista l1 = linealizacion(c1->arbol);
+  lista l2 = linealizacion(c2->arbol);
+  lista aux = crear_lista();
+  localizador loc1 = inicio_lista(l1);
+  localizador loc2 = inicio_lista(l2);
+  while (es_localizador_lista(loc1) && es_localizador_lista(loc2)){
+    comp_t comparacion = comparar_texto(texto_info(info_lista(loc1, l1)), texto_info(info_lista(loc2, l2)));
+     switch (comparacion) {
+      case igual: {
+        loc2 = siguiente(loc2, l2);
+        loc1 = siguiente(loc1, l1);
+        break;
+      }
+      case mayor: {
+        loc2 = siguiente(loc2, l2);
+        break;
+      }
+      case menor: {
+        insertar_despues(info_lista(loc1, l1), final_lista(aux), aux);
+        loc1 = siguiente(loc1, l1);
+        break;
+      }
+    }
+  }
+  if (es_localizador_lista(loc1)){
+      while (es_localizador_lista){
+          insertar_despues(info_lista(loc1, l1), final_lista(aux), aux);
+          loc1 = siguiente(loc1, l1);
+    }
+  }
+  c->arbol = crear_balanceado(aux);
+  liberar_lista(l1);
+  liberar_lista(l2);
+  liberar_lista(aux);
+  return c;
+
 }
 
 /*
