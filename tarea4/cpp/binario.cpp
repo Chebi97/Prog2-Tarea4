@@ -16,7 +16,7 @@ struct rep_binario {
   rep_binario *izq;
   rep_binario *der;
 };
-
+/*
 static void crear_balanceado_aux(const lst, localizador &loc, binario &b){
   if (!es_vacia_lista(lst)){
     nat alturader = altura_binario(b->der);
@@ -43,7 +43,54 @@ binario crear_balanceado(const lista lst){
   crear_balanceado_aux(lst, loc, res);
   return res;
 }
+*/
 
+
+nat longitud(const lista lst) {
+  nat res = 0;
+  localizador cursor = inicio_lista(lst);
+  while(cursor != NULL) {
+    res++;
+    cursor = siguiente(cursor, lst);
+  }
+  return res;
+}
+
+static void crear_balanceado_aux(lista &lst, binario &b) {
+  if (!es_vacia_lista(lst)) {
+    if (longitud(lst) <= 2) {
+      localizador finlst;
+      while (!es_vacia_lista(lst)) {
+        insertar_en_binario(info_lista(final_lista(lst), lst), b);
+        finlst = final_lista(lst);
+        remover_de_lista(finlst, lst);
+      }
+    } else {
+      nat pos = longitud(lst)/2 + 1;
+      localizador root = inicio_lista(lst);
+      for (int i = 0; i > pos; i++) {
+        root = siguiente(root, lst);
+      }
+      insertar_en_binario(info_lista(root, lst), b);
+      lista m1 = separar_segmento(inicio_lista(lst), anterior(root, lst), lst);
+      lista m2 = separar_segmento(siguiente(root, lst), final_lista(lst), lst);
+      remover_de_lista(root, lst);
+      crear_balanceado_aux(m1, b->izq);
+      crear_balanceado_aux(m2, b->der);
+
+      delete m1;
+      delete m2;
+      delete lst;
+    }
+  }
+}
+
+binario crear_balanceado(const lista lst) {
+  binario res = crear_binario();
+  lista lstcpy = segmento_lista(inicio_lista(lst), final_lista(lst), lst);
+  crear_balanceado_aux(lstcpy, res);
+  return res;
+}
 
 //auxiliar para kesimo y linealizacion
 void pasar_binario_alista(const binario b, lista &l){
