@@ -92,6 +92,26 @@ binario crear_balanceado(const lista lst) {
   return res;
 }
 
+static void imprimir_textos_aux(cola_binarios c) {
+  escribir_texto(info_a_texto(frente(c)->dato));
+  printf(" ");
+  encolar(frente(c)->izq, c);
+  encolar(frente(c)->der, c);
+  desencolar(c);
+  if(!es_vacio_binario(frente(c))) {
+    imprimir_textos_aux(c);
+  }
+}
+
+void imprimir_textos(const binario b) {
+  if (!es_vacio_binario(b)) {
+    cola_binarios c = crear_cola_binarios();
+    encolar(b, c);
+    imprimir_textos_aux(c);
+    liberar_cola_binarios(c);
+  }
+}
+
 //auxiliar para kesimo y linealizacion
 void pasar_binario_alista(const binario b, lista &l){
   
