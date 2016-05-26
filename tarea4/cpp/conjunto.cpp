@@ -1,9 +1,8 @@
+
 /*
   Módulo de definición de `conjunto`.
-
   Se define un conjunto de elementos de tipo `info_t`.
   No puede haber dos elementos con el mismo dato de texto.
-
   Laboratorio de Programación 2.
   InCo-FIng-UDELAR
  */
@@ -14,6 +13,7 @@
  #include "../include/info.h"
  #include "../include/lista.h"
  #include "../include/binario.h"
+ #include "../include/conjunto.h"
 
 
  #include <stdlib.h>
@@ -93,6 +93,7 @@ conjunto interseccion(const conjunto c1, const conjunto c2){
       }
     }
   }
+  conjunto c = crear_conjunto();   // me parece que este linea es necesaria, aviso que la agregue
   c->arbol = crear_balanceado(aux);
   liberar_lista(l1);
   liberar_lista(l2);
@@ -143,6 +144,7 @@ conjunto diferencia(const conjunto c1, const conjunto c2){
           loc1 = siguiente(loc1, l1);
     }
   }
+  conjunto c = crear_conjunto();         //aca lo mismo
   c->arbol = crear_balanceado(aux);
   liberar_lista(l1);
   liberar_lista(l2);
@@ -155,20 +157,20 @@ conjunto diferencia(const conjunto c1, const conjunto c2){
   Devuelve `true` si el dato de texto de algún elemento de `c` es igual a `t`,
   o `false` en otro caso.
  */
-bool pertenece(const texto_t t, const conjunto c){
+bool pertenece(const texto_t t, const conjunto c) {
   bool res = false;
-  if (!es_vacio_conjunto(c)){
+  if (!es_vacio_conjunto(c)) {
     binario resaux = buscar_subarbol(t, c->arbol);
-    if (!es_vacio_binario(res_aux))
-      res = true
-    }
+    if (!es_vacio_binario(resaux))
+      res = true;
+  }
   return res;
 }
 
 /*
   Devuelve `true` si `c` es vacío (no tiene elementos) o `false` en otro caso.
  */
-bool es_vacio_conjunto(const conjunto c){return (c == NULL || c->arbol == NULL)}
+bool es_vacio_conjunto(const conjunto c) {return (c == NULL || c->arbol == NULL);}
 
 /*
   Libera la memoria asignada a `c` y la de todos sus elementos.
