@@ -43,8 +43,8 @@ struct node {
 
 struct rep_cola_prioridad {
   node *array_lista;
-  nat cant;    //cantidad de array_listaentos con distinta prioridad en la cola de prioridad
-  nat size;    //tamanio (maxima cantidad de array_listaentos con distinta prioridad en la cola)
+  nat cant;    //cantidad de elementos con distinta prioridad en la cola de prioridad
+  nat size;    //tamanio (maxima cantidad de elementos con distinta prioridad en la cola)
   nat *indice; //indica cantidad de array_listaentos con cierta prioridad
 };
 
@@ -155,9 +155,18 @@ void eliminar_prioritario(cola_de_prioridad &c) {
 }
 
 /*
-  Libera la menoria asignada a `c` y a sus array_listaentos.
+  Libera la menoria asignada a `c` y a sus elementos.
  */
-void liberar_cp(cola_de_prioridad &c);
+void liberar_cp(cola_de_prioridad &c) {
+  int i = 0;
+  while(i > c->size) {
+    liberar_lista(c->array_lista[i].list);
+    i++;
+  }
+  delete [] c->array_lista;
+  delete [] c->indice;
+  delete c;
+}
 
 /* Predicados */
 
@@ -179,29 +188,39 @@ bool hay_prioridad(const prio_t p, const cola_de_prioridad c) {
   return res;
 }
 
-/* Selectoras */
+static lista lista_en_cp_aux(const prio_t p, const cola_de_prioridad c, nat lugar) {
+  lista res;
+  if(c->array_lista[lugar].prio == p) {
+    res = c->array_lista[lugar].list;
+  } else {
+    res = lista_en_cp_aux(p, c, lugar*2+1);
+    res = lista_en_cp_aux(p, c, lugar*2+2);
+  }
+  return res;
+}
+
+lista lista_en_cp(const prio_t p, const cola_de_prioridad c) {
+  lista res = crear_lista();
+  if (hay_prioridad(p, c)) {
+    lista_en_cp_aux(p, c, 0);
+  }
+  return res;
+}
 
 /*
-  Devuelve la lista de array_listaentos de `c` asociados al valor `p`.
-  Si no hay array_listaentos que cumplan esa condición devuelve una lista vacia.
-  Si la lista devuelta no es vacía comparte memoria con `c`.
-  El tiempo de ejecución es O(tamanio).
-  Precondición: 1 <= `p` <= tamanio.
- */
-lista lista_en_cp(const prio_t p, const cola_de_prioridad c);
-
-/*
-  Devuelve el array_listaento prioritario de `c`.
+  Devuelve el elemento prioritario de `c`.
   Precondición ! es_vacia_cola_de_prioridad(c).
   El tiempo de ejecución es O(1).
  */
-info_t prioritario(const cola_de_prioridad c);
+info_t prioritario(const cola_de_prioridad c) {
+  return info_lista(final_lista(c->array_lista[0].list), c->array_lista[0].list);
+}
 
 /*
-  Devuelve el valor asociado al array_listaento prioritario.
+  Devuelve el valor asociado al elemento prioritario.
   Precondición ! es_vacia_cola_de_prioridad(c),
   El tiempo de ejecución es O(1).
  */
-prio_t valor_prioritario(const cola_de_prioridad c);
-
-#endif
+prio_t valor_prioritario(const cola_de_prioridad c) {
+  return c->array_lista[0].prio;
+}
