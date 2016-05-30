@@ -24,14 +24,6 @@ struct rep_lista {
   nodo *inicio;
   nodo *final;
 };
-void imprimir_lista(const lista lst) {
-  localizador cursor = inicio_lista(lst);
-  while (cursor != NULL) {
-    escribir_texto(info_a_texto(info_lista(cursor, lst)));
-    cursor = siguiente(cursor, lst);
-  }
-  printf("\n");
-}
 
 lista crear_lista() {
   // se obtiene espacio para la cabecera
@@ -230,27 +222,25 @@ lista separar_segmento(localizador desde, localizador hasta, lista &lst) {
 }
 
 void remover_de_lista(localizador &loc, lista &lst) {
-  if (!es_vacia_lista(lst) && localizador_pertenece_a_lista (loc, lst)) {
+  if (!es_vacia_lista(lst) && localizador_pertenece_a_lista(loc, lst)) {
     info_t aux = info_lista(loc, lst);
     liberar_info(aux);
 
     if (loc == lst->inicio && loc == lst->final) {
       lst->inicio = NULL;
       lst->final = NULL;
-    } else
-      if (loc == lst->inicio) {
-        lst->inicio = lst->inicio->siguiente;
-        lst->inicio->anterior = NULL;
-        //loc->siguiente->anterior = NULL;
-      } else
-        if (loc == lst->final) {
-          lst->final = lst->final->anterior;
-          lst->final->siguiente = NULL;
-          //loc->anterior->siguiente = NULL;
-        } else {
-          loc->siguiente->anterior = loc->anterior;
-          loc->anterior->siguiente = loc->siguiente;
-        }
+    } else if (loc == lst->inicio) {
+      lst->inicio = lst->inicio->siguiente;
+      lst->inicio->anterior = NULL;
+      //loc->siguiente->anterior = NULL;
+    } else if (loc == lst->final) {
+      lst->final = lst->final->anterior;
+      lst->final->siguiente = NULL;
+      //loc->anterior->siguiente = NULL;
+    } else {
+      loc->siguiente->anterior = loc->anterior;
+      loc->anterior->siguiente = loc->siguiente;
+    }
     delete loc;
     loc = NULL;
   }

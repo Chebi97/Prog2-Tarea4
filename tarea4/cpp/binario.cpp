@@ -3,7 +3,9 @@
 #include "../include/info.h"
 #include "../include/lista.h"
 #include "../include/binario.h"
-#include "../include/uso_lista_arboles.h"
+#include "../include/pila.h"
+#include "../include/cola_binarios.h"
+
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -16,34 +18,6 @@ struct rep_binario {
   rep_binario *izq;
   rep_binario *der;
 };
-/*
-static void crear_balanceado_aux(const lst, localizador &loc, binario &b){
-  if (!es_vacia_lista(lst)){
-    nat alturader = altura_binario(b->der);
-    nat alturaizq = altura_binario(b->izq);
-    if (alturaizq == alturader)){
-      insertar_en_binario(info_lista(loc, lst), b)
-    } else {
-      if (alturaizq == alturader+1){
-        insertar_en_binario(info_lista(loc, lst), b->izq);
-      }
-      if (1 + alturaizq == alturader){
-        insertar_en_binario(info_lista(loc, lst), b->der);
-      }
-    }
-    loc = siguiente(loc, lst);
-    crear_balanceado_aux(lst, loc, b);
-  }
-}
-
-
-binario crear_balanceado(const lista lst){
-  localizador loc = inicio_lista;
-  binario res = crear_binario();
-  crear_balanceado_aux(lst, loc, res);
-  return res;
-}
-*/
 
 
 nat longitud(const lista lst) {
@@ -58,29 +32,27 @@ nat longitud(const lista lst) {
 
 static void crear_balanceado_aux(lista &lst, binario &b) {
   if (!es_vacia_lista(lst)) {
-    if (longitud(lst) <= 2) {
-      localizador finlst;
-      while (!es_vacia_lista(lst)) {
-        insertar_en_binario(info_lista(final_lista(lst), lst), b);
-        finlst = final_lista(lst);
-        remover_de_lista(finlst, lst);
+    nat l = longitud(lst);
+    if (l <= 2) {
+      localizador cursor = final_lista(lst);
+      while (localizador_pertenece_a_lista(cursor, lst)) {
+        insertar_en_binario(info_lista(cursor, lst), b);
+        cursor = anterior(cursor, lst);
       }
     } else {
-      nat pos = longitud(lst)/2 + 1;
+      nat pos = l/2;
       localizador root = inicio_lista(lst);
-      for (int i = 0; i > pos; i++) {
+      for (int i = 1; i <= pos; i++) {
         root = siguiente(root, lst);
       }
       insertar_en_binario(info_lista(root, lst), b);
       lista m1 = separar_segmento(inicio_lista(lst), anterior(root, lst), lst);
       lista m2 = separar_segmento(siguiente(root, lst), final_lista(lst), lst);
-      remover_de_lista(root, lst);
       crear_balanceado_aux(m1, b->izq);
       crear_balanceado_aux(m2, b->der);
 
-      delete m1;
-      delete m2;
-      delete lst;
+      liberar_lista(m1);
+      liberar_lista(m2);
     }
   }
 }
@@ -89,16 +61,21 @@ binario crear_balanceado(const lista lst) {
   binario res = crear_binario();
   lista lstcpy = segmento_lista(inicio_lista(lst), final_lista(lst), lst);
   crear_balanceado_aux(lstcpy, res);
+  liberar_lista(lstcpy);
   return res;
 }
 
 static void imprimir_textos_aux(cola_binarios c) {
-  escribir_texto(info_a_texto(frente(c)->dato));
+  escribir_texto(texto_info((frente(c)->dato)));
   printf(" ");
-  encolar(frente(c)->izq, c);
-  encolar(frente(c)->der, c);
+  if (!es_vacio_binario(frente(c)->izq)) {
+    encolar(frente(c)->izq, c);
+  }
+  if (!es_vacio_binario(frente(c)->der)) {
+    encolar(frente(c)->der, c);
+  }
   desencolar(c);
-  if(!es_vacio_binario(frente(c))) {
+  if (!es_vacia_cola_binarios(c)) {
     imprimir_textos_aux(c);
   }
 }
@@ -112,27 +89,36 @@ void imprimir_textos(const binario b) {
   }
 }
 
-//auxiliar para kesimo y linealizacion
-void pasar_binario_alista(const binario b, lista &l){
-  
-  if (b!=NULL && !es_vacio_binario(b)){
-    pasar_binario_alista(izquierdo(b), l);
+//auxiliar para kesimo (comparte memoria)
+void pasar_binario_alista_k(const binario b, lista &l) {
+  if (b != NULL && !es_vacio_binario(b)) {
+    pasar_binario_alista_k(izquierdo(b), l);
     insertar_despues(raiz_binario(b), final_lista(l), l);
-    pasar_binario_alista(derecho(b), l);
+    pasar_binario_alista_k(derecho(b), l);
   }
-
 }
+
+//auxiliar para linealizacion (no comparte memoria)
+void pasar_binario_alista_l(const binario b, lista &l) {
+  if (b != NULL && !es_vacio_binario(b)) {
+    pasar_binario_alista_l(izquierdo(b), l);
+    info_t copia = copiar_info(raiz_binario(b));
+    insertar_despues(copia, final_lista(l), l);
+    pasar_binario_alista_l(derecho(b), l);
+  }
+}
+
 lista linealizacion(const binario b){
     lista res = crear_lista();
-    pasar_binario_alista(b, res); //revisar orden
+    pasar_binario_alista_l(b, res); //revisar orden
     return res;
 }
 binario kesimo_subarbol(const nat k, const binario b) {
 //asumo que comparte memoria
   lista listabinario = crear_lista();
-  pasar_binario_alista(b, listabinario);
+  pasar_binario_alista_k(b, listabinario);
   localizador kesima_raiz = inicio_lista(listabinario);
-  for(nat j=1; j< k; j++){ 
+  for(nat j=1; j< k; j++){
       kesima_raiz = siguiente(kesima_raiz, listabinario);
   }
   binario res = buscar_subarbol(texto_info(info_lista(kesima_raiz, listabinario)), b);
@@ -364,99 +350,6 @@ nat cantidad_binario(const binario b) {
   if (!es_vacio_binario(b)) {
     res = 1 + cantidad_binario(b->der) + cantidad_binario(b->izq);
   }
-  return res;
-}
-
-nat cantidad_de_caminos(const lista l, const binario b) {
-  nat res = 0;
-  if (!es_vacia_lista(l) && !es_vacio_binario(b)) {
-    if (numero_info(info_lista(inicio_lista(l), l)) == numero_info(b->dato)) {
-      if (siguiente(inicio_lista(l), l) != NULL) {
-        lista lTail = segmento_lista(siguiente(inicio_lista(l), l), final_lista(l), l);
-        res = cantidad_de_caminos(lTail, b->der) + cantidad_de_caminos(lTail, b->izq);
-        liberar_lista(lTail);
-      } else {
-        if (es_vacio_binario(b->der) && es_vacio_binario(b->izq)) {
-          res = 1;
-        }
-      }
-    }
-  }
-  return res;
-}
-
-/*
-  Auxiliar para camino_a_texto.
- */
-static void agregar_rama(char *cadena, rama_t r) {
-  switch (r) {
-  case izq:
-    strcat(cadena, "I");
-    break;
-  case der:
-    strcat(cadena, "D");
-    break;
-  }
-}
-
-texto_t camino_a_texto(const camino_t c) {
-  texto_t res;
-  // espacio suficiente para "No existe" o para cada rama y la coma y la
-  // cantidad, el guión y los paréntesis.
-  char cadena[c.cantidad_ramas * 2 + 10];
-  if (!c.existe) {
-    strcpy(cadena, "No existe");
-  } else {
-    sprintf(cadena, "%d", c.cantidad_ramas);
-    strcat(cadena, "-(");
-    if (c.cantidad_ramas > 0) {
-      agregar_rama(cadena, c.ramas[0]);
-      for (nat i = 1; i < c.cantidad_ramas; i++) {
-        strcat(cadena, ",");
-        agregar_rama(cadena, c.ramas[i]);
-      }
-    }
-    strcat(cadena, ")");
-  }
-  res = cadena_a_texto(cadena);
-  return res;
-}
-
-static camino_t buscar_camino_aux(const lista l, const binario b, camino_t &c) {
-  if (!es_vacia_lista(l) && !es_vacio_binario(b)) {
-    if ( comparar_texto(texto_info(info_lista(inicio_lista(l), l)), texto_info(b->dato)) == igual) {
-      if (siguiente(inicio_lista(l), l) != NULL) {
-        lista lTail = segmento_lista(siguiente(inicio_lista(l), l), final_lista(l), l);
-        if (comparar_texto(texto_info(info_lista(inicio_lista(lTail), lTail)), texto_info(b->dato)) == mayor) {
-          c.ramas[c.cantidad_ramas] = der;
-          c.cantidad_ramas++;
-          buscar_camino_aux(lTail, b->der, c);
-        } else {
-          c.ramas[c.cantidad_ramas] = izq;
-          c.cantidad_ramas++;
-          buscar_camino_aux(lTail, b->izq, c);
-        }
-        liberar_lista(lTail);
-      } else {
-        if (es_vacio_binario(b->der) && es_vacio_binario(b->izq)) {
-          c.existe = true;
-        }
-      }
-    }
-  }
-  return c;
-}
-
-camino_t buscar_camino(const lista l, const binario b) {
-  camino_t res;
-  res.existe = false;
-  res.cantidad_ramas = 0;
-  res.ramas = new rama_t[longitud(l) - 1];
-
-  if (!es_vacia_lista(l) && !es_vacio_binario(b)) {
-    res = buscar_camino_aux(l, b, res);
-  }
-
   return res;
 }
 

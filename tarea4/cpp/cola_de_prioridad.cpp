@@ -29,6 +29,7 @@
 #include "../include/lista.h"
 #include "../include/binario.h"
 #include "../include/pila.h"
+#include "../include/cola_de_prioridad.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -57,11 +58,11 @@ typedef rep_cola_prioridad *cola_de_prioridad;
   prioridades diferentes.
  */
 cola_de_prioridad crear_cp(nat tamanio) {
-  cola_de_prioridad res;
+  cola_de_prioridad res = new rep_cola_prioridad;
   res->array_lista = new node[tamanio];
   res->indice = new nat[tamanio];
   for (int i = 0; i <= tamanio - 1; i++) {
-    res->array_lista[i] = crear_lista();
+    res->array_lista[i].list = crear_lista();
     res->indice[i] = 0;
   }
   res->cant = 0;
@@ -84,12 +85,11 @@ void insertar_en_cp(const info_t i, prio_t p, cola_de_prioridad &c) {
     insertar_en_cp_prio(i, p, c, 0);
   } else {
     nat lugar = c->cant;
-    c->array_lista[lugar] = new node;
     c->array_lista[lugar].list = crear_lista();
     insertar_despues(i, final_lista(c->array_lista[lugar].list), c->array_lista[lugar].list);
     c->array_lista[lugar].prio = p;
     while(c->array_lista[lugar].prio > c->array_lista[lugar/2].prio) {
-      node aux = c->array_lista[lugar/2].list;
+      node aux = c->array_lista[lugar/2];
       c->array_lista[lugar/2] = c->array_lista[lugar];
       c->array_lista[lugar] = aux;
       lugar = lugar/2;
