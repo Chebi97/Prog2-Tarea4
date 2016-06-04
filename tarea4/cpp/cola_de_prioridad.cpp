@@ -1,28 +1,3 @@
-/*
-  Módulo de definición de `cola_de_prioridad`.
-
-  Se definen las colas de prioridad en las que los array_listaentos son de tipo
-  `info_t`.
-  Debe implementarse con un heap.
-  La cola es acotada en cuanto a la cantidad de prioridades posibles, pero no
-  en cuanto a la cantidad de array_listaentos que contiene.
-  La cantidad de prioridades es establecida en el parámetro `tamanio` de
-  `crear_cola_de_prioridad`. En lo que sigue `tamanio` representa ese valor.
-
-  El orden de prioridad de los array_listaentos está determinado por un parámetro `p`
-  de tipo `prio_t` con el que los array_listaentos quedan asociados y que es pasado al
-  insertar los array_listaentos. El valor del parámetro `p` debe estar entre 1 y
-  `tamanio`.
-  Se considera que el array_listaento prioritario es aquel que fue insertado con un
-  valor menor de `p`. Si más de un array_listaento cumple esa condición, el
-  prioritario es el que se haya insertado primero entre los que la cumplen.
-
-
-  Laboratorio de Programación 2.
-  InCo-FIng-UDELAR
- */
-
-
 #include "../include/utils.h"
 #include "../include/texto.h"
 #include "../include/info.h"
@@ -61,8 +36,9 @@ cola_de_prioridad crear_cp(nat tamanio) {
   cola_de_prioridad res = new rep_cola_prioridad;
   res->array_lista = new node[tamanio];
   res->indice = new nat[tamanio];
-  for (int i = 0; i <= tamanio - 1; i++) {
+  for (nat i = 0; i <= tamanio - 1; i++) {
     res->array_lista[i].list = crear_lista();
+    res->array_lista[i].prio = 0;
     res->indice[i] = 0;
   }
   res->cant = 0;
@@ -88,21 +64,21 @@ void insertar_en_cp(const info_t i, prio_t p, cola_de_prioridad &c) {
     c->array_lista[lugar].list = crear_lista();
     insertar_despues(i, final_lista(c->array_lista[lugar].list), c->array_lista[lugar].list);
     c->array_lista[lugar].prio = p;
-    while(c->array_lista[lugar].prio > c->array_lista[lugar/2].prio) {
+    while(c->array_lista[lugar].prio < c->array_lista[lugar/2].prio) {
       node aux = c->array_lista[lugar/2];
       c->array_lista[lugar/2] = c->array_lista[lugar];
       c->array_lista[lugar] = aux;
       lugar = lugar/2;
     }
-    c->cant = c->cant + 1;
+    c->cant++;
   }
-  c->indice[p] = c->indice[p] + 1;
+  c->indice[p-1]++; //en el valor p esta el siguiente, tenemos el cero en el array
 }
 
 
 //Devuelve true si el lugar del heap que se pregunta tiene algun elemento
 static bool existe_lugar (nat l, cola_de_prioridad c) {
-  bool res = (l >= c->size - 1 && !es_vacia_lista(c->array_lista[l].list));
+  bool res = ((l <= (c->size - 1)) && (!es_vacia_lista(c->array_lista[l].list)));
   return res;
 }
 //Devuelve true si existe al menos uno de los dos hijos.
@@ -135,21 +111,41 @@ static nat lugar_hmin (nat lugar_p, cola_de_prioridad c) {
 void eliminar_prioritario(cola_de_prioridad &c) {
   if (!es_vacia_cp(c)) {
     localizador in_list = inicio_lista(c->array_lista[0].list);
-    if (c->indice[c->array_lista[0].prio] >= 2) {
+    if (c->indice[c->array_lista[0].prio - 1] > 1) { //contamos el cero xa prio en el array
       remover_de_lista(in_list, c->array_lista[0].list);
+      c->indice[c->array_lista[0].prio - 1]--;
     } else {
       remover_de_lista(in_list, c->array_lista[0].list);
-      c->array_lista[0].list = c->array_lista[c->cant - 1].list;
-      c->array_lista[0].prio = c->array_lista[c->cant - 1].prio;
-      nat lugar = 0;
-      node aux;
+      nat prio_aux = c->array_lista[0].prio;
+      if (c->cant == 1){
+        c->array_lista[0].prio = 0;
+      } else {
+        c->array_lista[0].list = c->array_lista[c->cant - 1].list;
+        c->array_lista[0].prio = c->array_lista[c->cant - 1].prio;
+        c->array_lista[c->cant - 1].list = crear_lista();
+        c->array_lista[c->cant - 1].prio = 0;
+/*        nat lugar = 0;
+        node aux;
+          while(existe_hijo(lugar, c) &&
+                c->array_lista[lugar].prio > c->array_lista[lugar_hmin(lugar, c)].prio) {
+            aux = c->array_lista[lugar];
+            c->array_lista[lugar] = c->array_lista[lugar_hmin(lugar, c)];
+            c->array_lista[lugar_hmin(lugar, c)] = aux;
+            lugar = lugar_hmin(lugar, c);
+        }*/
+      }
+      c->cant--;
+      c->indice[prio_aux - 1] = 0; //ya se que no me quedan mas de esta prio.
+    } //siempre quiero reordenar el arbol. Si no hay que, no entra al while.
+    nat lugar = 0;
+    node aux;
       while(existe_hijo(lugar, c) &&
             c->array_lista[lugar].prio > c->array_lista[lugar_hmin(lugar, c)].prio) {
         aux = c->array_lista[lugar];
-        c->array_lista[lugar] = c->array_lista[lugar_hmin(lugar, c)];
-        c->array_lista[lugar_hmin(lugar, c)] = aux;
-        lugar = lugar_hmin(lugar, c);
-      }
+        nat hmin = lugar_hmin(lugar, c);
+        c->array_lista[lugar] = c->array_lista[hmin];
+        c->array_lista[hmin] = aux;
+        lugar = hmin;
     }
   }
 }
@@ -158,7 +154,7 @@ void eliminar_prioritario(cola_de_prioridad &c) {
   Libera la menoria asignada a `c` y a sus elementos.
  */
 void liberar_cp(cola_de_prioridad &c) {
-  int i = 0;
+  nat i = 0;
   while(i > c->size) {
     liberar_lista(c->array_lista[i].list);
     i++;
@@ -188,21 +184,15 @@ bool hay_prioridad(const prio_t p, const cola_de_prioridad c) {
   return res;
 }
 
-static lista lista_en_cp_aux(const prio_t p, const cola_de_prioridad c, nat lugar) {
-  lista res;
-  if(c->array_lista[lugar].prio == p) {
-    res = c->array_lista[lugar].list;
-  } else {
-    res = lista_en_cp_aux(p, c, lugar*2+1);
-    res = lista_en_cp_aux(p, c, lugar*2+2);
-  }
-  return res;
-}
-
 lista lista_en_cp(const prio_t p, const cola_de_prioridad c) {
   lista res = crear_lista();
+  nat i = 0;
   if (hay_prioridad(p, c)) {
-    lista_en_cp_aux(p, c, 0);
+    liberar_lista(res);
+    while (c->array_lista[i].prio != p){
+      i++;
+    }
+    res = c->array_lista[i].list;
   }
   return res;
 }
@@ -213,7 +203,7 @@ lista lista_en_cp(const prio_t p, const cola_de_prioridad c) {
   El tiempo de ejecución es O(1).
  */
 info_t prioritario(const cola_de_prioridad c) {
-  return info_lista(final_lista(c->array_lista[0].list), c->array_lista[0].list);
+  return info_lista(inicio_lista(c->array_lista[0].list), c->array_lista[0].list); //el final de la lista es el ultimo insertado. preciso inicio, mas prio
 }
 
 /*
