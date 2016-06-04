@@ -65,26 +65,64 @@ binario crear_balanceado(const lista lst) {
   return res;
 }
 
-static void imprimir_textos_aux(cola_binarios c) {
-  escribir_texto(texto_info((frente(c)->dato)));
-  printf(" ");
-  if (!es_vacio_binario(frente(c)->izq)) {
-    encolar(frente(c)->izq, c);
+static nat nivel_aux(const texto_t t, binario b, nat n) {
+  nat res;
+  comp_t comparacion = comparar_texto(texto_info(b->dato), t);
+  switch (comparacion) {
+    case igual: {
+      res = n;
+      break;
+    }
+    case mayor: {
+      n++;
+      res = nivel_aux(t, b->izq, n);
+      break;
+    }
+    case menor: {
+      n++;
+      res = nivel_aux(t, b->der, n);
+      break;
+    }
   }
+  return res;
+}
+
+/*
+ * Devuelve el nivel del elemento con t como texto
+ * Precondicion: t pertenece a b
+ */
+static nat nivel(const texto_t t, binario b) {
+  nat res = nivel_aux(t, b, 1);
+  return res;
+}
+
+
+static void imprimir_textos_aux(cola_binarios c, nat n_siguiente, const binario b) {
+  texto_t copia = copiar_texto(texto_info((frente(c)->dato)));
+  nat n_actual = nivel(copia, b);
   if (!es_vacio_binario(frente(c)->der)) {
     encolar(frente(c)->der, c);
   }
+  if (!es_vacio_binario(frente(c)->izq)) {
+    encolar(frente(c)->izq, c);
+  }
   desencolar(c);
   if (!es_vacia_cola_binarios(c)) {
-    imprimir_textos_aux(c);
+    imprimir_textos_aux(c, n_actual, b);
   }
+  escribir_texto(copia);
+  printf(" ");
+  if (n_actual != n_siguiente) {
+    printf("\n");
+  }
+  liberar_texto(copia);
 }
 
 void imprimir_textos(const binario b) {
   if (!es_vacio_binario(b)) {
     cola_binarios c = crear_cola_binarios();
     encolar(b, c);
-    imprimir_textos_aux(c);
+    imprimir_textos_aux(c, 1, b);
     liberar_cola_binarios(c);
   }
 }
@@ -110,7 +148,7 @@ void pasar_binario_alista_l(const binario b, lista &l) {
 
 lista linealizacion(const binario b){
     lista res = crear_lista();
-    pasar_binario_alista_l(b, res); //revisar orden
+    pasar_binario_alista_l(b, res);
     return res;
 }
 binario kesimo_subarbol(const nat k, const binario b) {
