@@ -333,8 +333,9 @@ void remover_de_binario(const texto_t t, binario &b) {
 
 void liberar_binario(binario &b) {
   if (!es_vacio_binario(b)) {
+    liberar_binario(b->izq);
+    liberar_binario(b->der);
     remover_de_binario(texto_info(b->dato), b);
-    liberar_binario(b);
   }
 }
 
